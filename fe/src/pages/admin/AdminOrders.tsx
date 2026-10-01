@@ -63,7 +63,7 @@ function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-screen w-52 bg-white border-r border-stone-200 flex flex-col z-20 shadow-sm">
       <div className="px-5 py-5 border-b border-stone-100">
-        <h1 className="text-[18px] font-black text-amber-600 tracking-tight leading-none">FastBite</h1>
+        <h1 className="text-[22px] font-black tracking-tight leading-none" style={{ color: '#B8A98C', fontFamily: 'serif' }}>mannis</h1>
         <p className="text-[10px] font-semibold text-stone-400 tracking-widest uppercase mt-0.5">Command Center</p>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -114,8 +114,8 @@ export default function AdminOrders() {
     try {
       setLoading(true);
       const url = keyword
-        ? `https://3254jhsj-5029.asse.devtunnels.ms/api/orders?search=${keyword}`
-        : `https://3254jhsj-5029.asse.devtunnels.ms/api/orders`;
+        ? `http://localhost:5029/api/orders?search=${keyword}`
+        : `http://localhost:5029/api/orders`;
       const response = await fetch(url);
       const data = await response.json();
       setOrders(data);
@@ -135,7 +135,7 @@ export default function AdminOrders() {
   const handleMarkAsLunas = async (orderId: number) => {
     try {
       const response = await fetch(
-        `https://3254jhsj-5029.asse.devtunnels.ms/api/orders/${orderId}/lunas`,
+        `http://localhost:5029/api/orders/${orderId}/lunas`,
         { method: 'PUT' }
       );
       if (response.ok) fetchOrders(search);
@@ -147,7 +147,7 @@ export default function AdminOrders() {
   const handlePrintReceipt = async (orderId: number) => {
     try {
       const response = await fetch(
-        `https://3254jhsj-5029.asse.devtunnels.ms/api/orders/${orderId}/struk`
+        `http://localhost:5029/api/orders/${orderId}/struk`
       );
       const data = await response.json();
       if (response.ok) setSelectedReceipt(data);

@@ -24,7 +24,7 @@ function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-screen w-52 bg-white border-r border-stone-200 flex flex-col z-20 shadow-sm">
       <div className="px-5 py-5 border-b border-stone-100">
-        <h1 className="text-[18px] font-black text-amber-600 tracking-tight leading-none">FastBite</h1>
+        <h1 className="text-[22px] font-black tracking-tight leading-none" style={{ color: '#B8A98C', fontFamily: 'serif' }}>mannis</h1>
         <p className="text-[10px] font-semibold text-stone-400 tracking-widest uppercase mt-0.5">Command Center</p>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -86,11 +86,8 @@ function ProductFormModal({ isEditing, initial, onSave, onCancel }: ProductFormP
       try {
         const formData = new FormData();
         formData.append('file', selectedFile);
-        const res = await fetch('https://3254jhsj-5029.asse.devtunnels.ms/api/products/upload-image', {
+        const res = await fetch('http://localhost:5029/api/products/upload-image', {
           method: 'POST',
-          headers: {
-            'X-Tunnel-Skip-Anti-Phishing-Page': 'true',
-          },
           body: formData,
         });
         if (!res.ok) {
@@ -200,8 +197,8 @@ export default function AdminInventory() {
     try {
       setLoading(true);
       const url = keyword
-        ? `https://3254jhsj-5029.asse.devtunnels.ms/api/products?search=${keyword}`
-        : `https://3254jhsj-5029.asse.devtunnels.ms/api/products`;
+        ? `http://localhost:5029/api/products?search=${keyword}`
+        : `http://localhost:5029/api/products`;
       const response = await fetch(url);
       setProducts(await response.json());
       setCurrentPage(1);
@@ -220,8 +217,8 @@ export default function AdminInventory() {
   const handleSaveProduct = async (payload: Omit<Product, 'productId'> & { productId: number }) => {
     const isEditing = payload.productId !== 0;
     const url = isEditing
-      ? `https://3254jhsj-5029.asse.devtunnels.ms/api/products/${payload.productId}`
-      : `https://3254jhsj-5029.asse.devtunnels.ms/api/products`;
+      ? `http://localhost:5029/api/products/${payload.productId}`
+      : `http://localhost:5029/api/products`;
 
     // Untuk POST (tambah baru), hapus productId dari body agar tidak bentrok dengan backend
     const body = isEditing
@@ -257,7 +254,7 @@ export default function AdminInventory() {
   const handleDeleteClick = async (productId: number) => {
     if (!window.confirm('Yakin ingin menghapus produk ini?')) return;
     try {
-      const response = await fetch(`https://3254jhsj-5029.asse.devtunnels.ms/api/products/${productId}`, { method: 'DELETE' });
+      const response = await fetch(`http://localhost:5029/api/products/${productId}`, { method: 'DELETE' });
       if (response.ok) fetchInventory(search);
     } catch (error) { console.error('Gagal menghapus produk:', error); }
   };

@@ -25,7 +25,7 @@ export default function OrderSuccess() {
     const fetchOrderData = async () => {
       try {
         const response = await fetch(
-          `https://3254jhsj-5029.asse.devtunnels.ms/api/orders?search=${id}`
+          `http://localhost:5029/api/orders?search=${id}`
         );
         if (response.ok) {
           const data = await response.json();
@@ -43,9 +43,9 @@ export default function OrderSuccess() {
   // ── Loading ──
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-[#fffdfa] to-orange-50 flex items-center justify-center font-sans">
+      <div className="min-h-screen bg-white flex items-center justify-center font-sans">
         <div className="flex flex-col items-center gap-4 animate-pulse">
-          <div className="w-24 h-24 bg-amber-200 rounded-full" />
+          <div className="w-24 h-24 rounded-full" style={{ backgroundColor: '#D4C9BE' }} />
           <div className="h-8 bg-stone-200 rounded-full w-48" />
           <div className="h-4 bg-stone-200 rounded-full w-64" />
           <div className="w-full max-w-md h-80 bg-white rounded-3xl shadow-sm mt-4" />
@@ -57,12 +57,12 @@ export default function OrderSuccess() {
   // ── Not found ──
   if (!order) {
     return (
-      <div className="min-h-screen bg-[#fffdfa] flex flex-col items-center justify-center font-sans text-[#2e2520] gap-3">
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center font-sans text-[#2e2520] gap-3">
         <svg className="w-14 h-14 text-stone-300" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
         </svg>
         <p className="text-stone-400 text-sm">Data pesanan tidak ditemukan.</p>
-        <button onClick={() => navigate('/menu')} className="text-amber-500 font-semibold text-sm hover:text-amber-600 transition">
+        <button onClick={() => navigate('/menu')} className="font-semibold text-sm hover:opacity-80 transition" style={{ color: '#B8A98C' }}>
           ← Kembali ke Menu
         </button>
       </div>
@@ -72,12 +72,12 @@ export default function OrderSuccess() {
   const tax = order.totalAmount * 0.1;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-[#fffdfa] to-orange-50 font-sans text-[#2e2520]">
+    <div className="min-h-screen bg-white font-sans text-[#2e2520]">
 
       {/* ── Decorative blobs ── */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-0">
-        <div className="absolute -top-32 -left-32 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl" />
-        <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-orange-200/20 rounded-full blur-3xl" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(184, 169, 140, 0.1)' }} />
+        <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full blur-3xl" style={{ backgroundColor: 'rgba(184, 169, 140, 0.15)' }} />
       </div>
 
       <div className="relative z-10 px-4 md:px-8 py-10 md:py-14">
@@ -89,13 +89,13 @@ export default function OrderSuccess() {
           <div className="flex flex-col items-center text-center gap-3">
             {/* Animated check circle */}
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-[#f59e0b] flex items-center justify-center shadow-xl shadow-amber-400/30">
+              <div className="w-24 h-24 rounded-full flex items-center justify-center shadow-xl" style={{ backgroundColor: '#B8A98C', boxShadow: '0 20px 25px -5px rgba(184, 169, 140, 0.3)' }}>
                 <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" strokeWidth="3" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                 </svg>
               </div>
               {/* Pulse ring */}
-              <div className="absolute inset-0 rounded-full bg-amber-400/20 scale-125 animate-ping" />
+              <div className="absolute inset-0 rounded-full scale-125 animate-ping" style={{ backgroundColor: 'rgba(184, 169, 140, 0.2)' }} />
             </div>
 
             <div className="mt-2">
@@ -119,7 +119,7 @@ export default function OrderSuccess() {
           ══════════════════════════════════════ */}
           <div className="flex items-center gap-3 flex-wrap justify-center">
             <div className="flex items-center gap-2 bg-white border border-stone-200 rounded-2xl px-4 py-2.5 shadow-sm">
-              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: '#B8A98C' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               <span className="text-[12px] text-stone-400 font-medium">Order</span>
@@ -127,7 +127,7 @@ export default function OrderSuccess() {
             </div>
 
             <div className="flex items-center gap-2 bg-white border border-stone-200 rounded-2xl px-4 py-2.5 shadow-sm">
-              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: '#B8A98C' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0" />
               </svg>
               <span className="text-[12px] text-stone-400 font-medium">Nama</span>
@@ -135,7 +135,7 @@ export default function OrderSuccess() {
             </div>
 
             <div className="flex items-center gap-2 bg-white border border-stone-200 rounded-2xl px-4 py-2.5 shadow-sm">
-              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: '#B8A98C' }} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 018.25 20.25H6A2.25 2.25 0 013.75 18v-2.25z" />
               </svg>
               <span className="text-[12px] text-stone-400 font-medium">Meja</span>
@@ -169,9 +169,9 @@ export default function OrderSuccess() {
             </div>
 
             {/* Kasir notice */}
-            <div className="flex items-center gap-3 px-6 py-3 bg-amber-50 border-b border-dashed border-amber-200">
-              <span className="text-amber-500 text-base shrink-0">⚠️</span>
-              <p className="text-[12px] text-amber-800 font-medium leading-snug">
+            <div className="flex items-center gap-3 px-6 py-3 border-b border-dashed border-gray-200" style={{ backgroundColor: '#F5F1EC' }}>
+              <span className="shrink-0" style={{ color: '#B8A98C' }}>⚠️</span>
+              <p className="text-[12px] font-medium leading-snug" style={{ color: '#6B5D4F' }}>
                 Silahkan menuju <strong>kasir</strong> untuk melakukan pembayaran.
               </p>
             </div>
@@ -187,7 +187,7 @@ export default function OrderSuccess() {
                   <div key={idx} className="flex items-start justify-between py-3 gap-3">
                     {/* Kiri */}
                     <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <span className="w-6 h-6 bg-[#f59e0b] text-white text-[10px] font-black rounded-md flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="w-6 h-6 text-white text-[10px] font-black rounded-md flex items-center justify-center shrink-0 mt-0.5" style={{ backgroundColor: '#B8A98C' }}>
                         {item.quantity}
                       </span>
                       <div className="min-w-0">
@@ -215,9 +215,9 @@ export default function OrderSuccess() {
 
             {/* Gerigi tiket */}
             <div className="relative flex items-center -my-1 z-10">
-              <div className="w-6 h-6 bg-gradient-to-br from-amber-50 via-[#fffdfa] to-orange-50 rounded-full -ml-3 border border-stone-200 shrink-0" />
+              <div className="w-6 h-6 bg-white rounded-full -ml-3 border border-stone-200 shrink-0" />
               <div className="flex-1 border-t-2 border-dashed border-stone-200" />
-              <div className="w-6 h-6 bg-gradient-to-br from-amber-50 via-[#fffdfa] to-orange-50 rounded-full -mr-3 border border-stone-200 shrink-0" />
+              <div className="w-6 h-6 bg-white rounded-full -mr-3 border border-stone-200 shrink-0" />
             </div>
 
             {/* Total breakdown */}
@@ -239,9 +239,9 @@ export default function OrderSuccess() {
             </div>
 
             {/* Total utama */}
-            <div className="flex justify-between items-center px-6 py-4 mx-4 mb-5 mt-3 bg-[#fdf4e9] rounded-2xl">
+            <div className="flex justify-between items-center px-6 py-4 mx-4 mb-5 mt-3 rounded-2xl" style={{ backgroundColor: '#F5F1EC' }}>
               <span className="text-[14px] font-bold text-[#2e2520]">Total Pembayaran</span>
-              <span className="text-[22px] font-black text-[#b45309]">
+              <span className="text-[22px] font-black" style={{ color: '#B8A98C' }}>
                 Rp {order.totalAmount.toLocaleString('id-ID')}
               </span>
             </div>
@@ -254,7 +254,8 @@ export default function OrderSuccess() {
           <div className="w-full flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => navigate('/menu')}
-              className="flex-1 rounded-full bg-[#f59e0b] hover:bg-[#d97706] active:bg-amber-700 text-white font-bold py-4 shadow-lg shadow-amber-400/30 flex justify-center items-center gap-2 text-[15px] transition"
+              className="flex-1 rounded-full text-white font-bold py-4 shadow-lg flex justify-center items-center gap-2 text-[15px] hover:opacity-90 transition"
+              style={{ backgroundColor: '#B8A98C' }}
             >
               🍴 Return to Menu
             </button>

@@ -36,7 +36,7 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
     const fetchProductDetail = async () => {
       try {
         const response = await fetch(
-          `https://3254jhsj-5029.asse.devtunnels.ms/api/products/${id}`
+          `http://localhost:5029/api/products/${id}`
         );
         if (response.ok) {
           setProduct(await response.json());
@@ -101,7 +101,7 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
       {!loading && !product && (
         <div className="text-center py-12 px-6">
           <p className="text-stone-400 text-sm mb-4">Menu tidak ditemukan atau habis.</p>
-          <button onClick={onClose} className="text-amber-500 font-semibold text-sm">← Kembali</button>
+          <button onClick={onClose} className="font-semibold text-sm hover:opacity-80 transition" style={{ color: '#B8A98C' }}>← Kembali</button>
         </div>
       )}
 
@@ -121,7 +121,7 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
                 </span>
               )}
             </div>
-            <p className="text-[20px] font-bold text-[#b45309] mt-1">
+            <p className="text-[20px] font-bold mt-1" style={{ color: '#B8A98C' }}>
               Rp {product.price.toLocaleString('id-ID')}
             </p>
           </div>
@@ -149,24 +149,27 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
               placeholder="contoh: Pedas level 3, Gak pake daun bawang"
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-[#fdfaf7] text-[13px] text-[#2e2520] placeholder-stone-300 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition resize-none"
+              className="w-full px-4 py-3 rounded-xl border border-stone-200 bg-white text-[13px] text-[#2e2520] placeholder-stone-300 outline-none transition resize-none"
+              style={{ boxShadow: 'none' }}
+              onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #B8A98C'}
+              onBlur={(e) => e.target.style.boxShadow = 'none'}
             />
           </div>
 
           {/* Set Quantity */}
-          <div className="flex items-center justify-between bg-[#fdf4e9] rounded-2xl px-4 py-3">
+          <div className="flex items-center justify-between rounded-2xl px-4 py-3" style={{ backgroundColor: '#F5F1EC' }}>
             <div>
               <p className="text-[11px] text-stone-400 font-medium uppercase tracking-wider">Jumlah</p>
               <p className="text-[14px] font-semibold text-[#2e2520]">Set Quantity</p>
             </div>
-            <div className="flex items-center bg-[#332922] rounded-full px-1 py-1 gap-1">
+            <div className="flex items-center rounded-full px-1 py-1 gap-1" style={{ backgroundColor: '#B8A98C' }}>
               <button
                 onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                 className="w-9 h-9 flex items-center justify-center text-white text-lg font-bold rounded-full hover:bg-white/10 active:bg-white/20 transition"
               >
                 −
               </button>
-              <span className="text-amber-400 font-bold text-[16px] min-w-[32px] text-center">
+              <span className="text-white font-bold text-[16px] min-w-[32px] text-center">
                 {quantity}
               </span>
               <button
@@ -181,7 +184,8 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
           {/* Add to Cart */}
           <button
             onClick={handleAddToCart}
-            className="w-full flex items-center justify-center gap-2.5 bg-[#f59e0b] hover:bg-amber-500 active:bg-amber-600 text-white font-bold text-[15px] py-4 rounded-full shadow-md shadow-amber-500/30 transition"
+            className="w-full flex items-center justify-center gap-2.5 text-white font-bold text-[15px] py-4 rounded-full shadow-md hover:opacity-90 transition"
+            style={{ backgroundColor: '#B8A98C' }}
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round"

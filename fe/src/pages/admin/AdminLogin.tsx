@@ -13,7 +13,7 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch('https://3254jhsj-5029.asse.devtunnels.ms/api/auth/login', {
+      const response = await fetch('http://localhost:5029/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -54,8 +54,8 @@ export default function AdminLogin() {
         
         {/* Brand text */}
         <div className="text-center">
-          <h1 className="text-2xl font-black text-stone-800 tracking-tight">
-            FastBite
+          <h1 className="text-3xl font-black tracking-tight" style={{ color: '#B8A98C', fontFamily: 'serif' }}>
+            mannis
           </h1>
           <p className="text-[11px] font-bold text-stone-400 tracking-[0.15em] uppercase mt-0.5">
             Command Center
@@ -93,7 +93,7 @@ export default function AdminLogin() {
               <input
                 type="text"
                 required
-                placeholder="admin@fastbite.com"
+                placeholder="admin@mannis.com"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="w-full pl-11 pr-4 py-3.5 rounded-xl border border-stone-200 bg-stone-50 text-[14px] text-stone-800 placeholder-stone-400 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 focus:bg-white transition"
@@ -173,7 +173,7 @@ export default function AdminLogin() {
 
       {/* ── FOOTER ── */}
       <p className="text-[11px] text-stone-400 mt-8 text-center">
-        © 2024 FastBite Command Center. All rights reserved.
+        © 2024 Mannis Command Center. All rights reserved.
       </p>
 
     </div>

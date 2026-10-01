@@ -52,8 +52,7 @@ namespace be.Controllers
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    Price = itemPrice,
-                    Notes = item.Notes
+                    Price = itemPrice
                 });
             }
 
@@ -61,10 +60,8 @@ namespace be.Controllers
             var order = new Order
             {
                 TableNumber = dto.TableNumber,
-                CustomerName = dto.CustomerName,
-                AdditionalNotes = dto.AdditionalNotes,
                 TotalAmount = totalAmount,
-                Status = "Belum Bayar", // Default awal sesuai requirement
+                PaymentStatus = "Belum Bayar", // Default awal sesuai requirement
                 OrderDate = DateTime.Now,
                 OrderDetails = orderDetailsList
             };
@@ -77,15 +74,13 @@ namespace be.Controllers
             {
                 message = "Pesanan berhasil dibuat!",
                 orderId = order.OrderId,
-                customerName = order.CustomerName,
                 tableNumber = order.TableNumber,
                 totalAmount = order.TotalAmount,
-                status = order.Status,
+                status = order.PaymentStatus,
                 items = order.OrderDetails.Select(od => new {
                     od.ProductId,
                     quantity = od.Quantity,
-                    price = od.Price,
-                    notes = od.Notes
+                    price = od.Price
                 })
             });
         }
@@ -103,16 +98,16 @@ namespace be.Controllers
                     .ThenInclude(od => od.Product)
                     .AsQueryable();
 
-                // Fitur Search yang ditingkatkan: Bisa membaca ID Order (Angka), Nama, atau Nomor Meja
+                // Fitur Search yang ditingkatkan: Bisa membaca ID Order (Angka) atau Nomor Meja
                 if (!string.IsNullOrEmpty(search))
                 {
                     if (int.TryParse(search, out int searchId))
                     {
-                        query = query.Where(o => o.OrderId == searchId || o.CustomerName.Contains(search) || o.TableNumber.Contains(search));
+                        query = query.Where(o => o.OrderId == searchId || o.TableNumber.Contains(search));
                     }
                     else
                     {
-                        query = query.Where(o => o.CustomerName.Contains(search) || o.TableNumber.Contains(search));
+                        query = query.Where(o => o.TableNumber.Contains(search));
                     }
                 }
 
@@ -123,17 +118,14 @@ namespace be.Controllers
                 {
                     o.OrderId,
                     o.TableNumber,
-                    o.CustomerName,
                     o.OrderDate,
                     o.TotalAmount,
-                    o.Status,
-                    o.AdditionalNotes,
+                    Status = o.PaymentStatus,
                     itemsBeli = o.OrderDetails.Select(od => new
                     {
                         NamaProduk = od.Product != null ? od.Product.ProductName : "Produk Dihapus",
                         od.Quantity,
-                        od.Price,
-                        od.Notes
+                        od.Price
                     })
                 });
 
@@ -156,10 +148,10 @@ namespace be.Controllers
                 return NotFound(new { message = "Orderan tidak ditemukan." });
             }
 
-            order.Status = "Lunas";
+            order.PaymentStatus = "Lunas";
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Status orderan berhasil diubah menjadi Lunas!", status = order.Status });
+            return Ok(new { message = "Status orderan berhasil diubah menjadi Lunas!", status = order.PaymentStatus });
         }
 
         // ADMIN: AMBIL DATA STRUK PEMBELIAN
@@ -177,7 +169,7 @@ namespace be.Controllers
                 return NotFound(new { message = "Orderan tidak ditemukan." });
             }
 
-            if (order.Status != "Lunas")
+            if (order.PaymentStatus != "Lunas")
             {
                 return BadRequest(new { message = "Struk belum bisa dibuat karena pesanan belum lunas." });
             }
@@ -190,7 +182,6 @@ namespace be.Controllers
                 WaktuCetak = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
                 NoNota = $"INV-{order.OrderId.ToString().PadLeft(5, '0')}",
                 Meja = order.TableNumber,
-                Pelanggan = order.CustomerName,
                 WaktuOrder = order.OrderDate.ToString("yyyy-MM-dd HH:mm:ss"),
                 ItemBelanja = order.OrderDetails.Select(od => new
                 {
@@ -200,7 +191,7 @@ namespace be.Controllers
                     SubTotal = od.Price * od.Quantity
                 }),
                 TotalBayar = order.TotalAmount,
-                StatusPembayaran = order.Status
+                StatusPembayaran = order.PaymentStatus
             };
 
             return Ok(receipt);

@@ -46,7 +46,7 @@ function Sidebar() {
   return (
     <aside className="fixed top-0 left-0 h-screen w-52 bg-white border-r border-stone-200 flex flex-col z-20 shadow-sm">
       <div className="px-5 py-5 border-b border-stone-100">
-        <h1 className="text-[18px] font-black text-amber-600 tracking-tight leading-none">FastBite</h1>
+        <h1 className="text-[22px] font-black tracking-tight leading-none" style={{ color: '#B8A98C', fontFamily: 'serif' }}>mannis</h1>
         <p className="text-[10px] font-semibold text-stone-400 tracking-widest uppercase mt-0.5">Command Center</p>
       </div>
       <nav className="flex-1 px-3 py-4 space-y-1">
@@ -83,7 +83,7 @@ export default function AdminDashboard() {
   const [dropdownLabel, setDropdownLabel] = useState('Last 7 Days');
   const navigate = useNavigate();
 
-  const BASE = 'https://3254jhsj-5029.asse.devtunnels.ms';
+  const BASE = 'http://localhost:5029';
 
   useEffect(() => {
     const fetchStats = async () => {

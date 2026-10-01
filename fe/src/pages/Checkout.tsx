@@ -53,7 +53,7 @@ export default function Checkout() {
 
     try {
       setLoading(true);
-      const response = await fetch('https://3254jhsj-5029.asse.devtunnels.ms/api/orders', {
+      const response = await fetch('http://localhost:5029/api/orders', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
@@ -74,12 +74,12 @@ export default function Checkout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#fffdfa] font-sans text-[#2e2520]">
+    <div className="min-h-screen bg-white font-sans text-[#2e2520]">
 
       {/* ══════════════════════════════════════════
           HEADER — full width, sticky
       ══════════════════════════════════════════ */}
-      <header className="sticky top-0 z-30 bg-[#fffdfa]/95 backdrop-blur-sm border-b border-stone-100 px-4 md:px-10 py-3">
+      <header className="sticky top-0 z-30 bg-white backdrop-blur-sm border-b border-stone-100 px-4 md:px-10 py-3">
         <div className="max-w-screen-xl mx-auto flex items-center justify-between">
           {/* Tombol kembali */}
           <button
@@ -96,7 +96,7 @@ export default function Checkout() {
           <h1 className="text-[17px] font-bold text-[#2e2520] tracking-tight">Checkout</h1>
 
           {/* Badge meja */}
-          <span className="bg-[#fdf4e9] text-[#2e2520] text-[12px] font-semibold px-3 py-1.5 rounded-full border border-amber-100">
+          <span className="text-[#2e2520] text-[12px] font-semibold px-3 py-1.5 rounded-full border border-gray-200" style={{ backgroundColor: '#F5F1EC' }}>
             Meja No: {tableNumber}
           </span>
         </div>
@@ -107,7 +107,7 @@ export default function Checkout() {
       ══════════════════════════════════════════ */}
       <div className="px-4 md:px-10 pt-4">
         <div className="max-w-screen-xl mx-auto">
-          <div className="bg-[#f59e0b] text-white px-4 py-3 rounded-xl flex items-start gap-2 text-xs font-medium">
+          <div className="text-white px-4 py-3 rounded-xl flex items-start gap-2 text-xs font-medium" style={{ backgroundColor: '#B8A98C' }}>
             <span className="mt-0.5 shrink-0">⚠️</span>
             <span>Pembayaran harus dilakukan di <strong>KASIR</strong> dengan menyebutkan nomor pesanan.</span>
           </div>
@@ -137,7 +137,7 @@ export default function Checkout() {
                   <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272" />
                 </svg>
                 <p className="text-sm font-medium mb-2">Keranjang kosong</p>
-                <button onClick={() => navigate('/menu')} className="text-amber-500 font-semibold text-sm hover:text-amber-600 transition">
+                <button onClick={() => navigate('/menu')} className="font-semibold text-sm hover:opacity-80 transition" style={{ color: '#B8A98C' }}>
                   Pilih Menu →
                 </button>
               </div>
@@ -162,7 +162,7 @@ export default function Checkout() {
                           <p className="text-[14px] font-bold text-[#2e2520] leading-tight line-clamp-2 flex-1">
                             {item.productName}
                           </p>
-                          <span className="text-[13px] font-bold text-amber-600 whitespace-nowrap shrink-0">
+                          <span className="text-[13px] font-bold whitespace-nowrap shrink-0" style={{ color: '#B8A98C' }}>
                             Rp {(item.price * item.quantity).toLocaleString('id-ID')}
                           </span>
                         </div>
@@ -176,10 +176,10 @@ export default function Checkout() {
 
                       {/* Counter */}
                       <div className="mt-2 flex items-center gap-0">
-                        <div className="bg-[#fdf4e9] rounded-full px-3 py-1 flex items-center gap-3 w-fit">
+                        <div className="rounded-full px-3 py-1 flex items-center gap-3 w-fit" style={{ backgroundColor: '#F5F1EC' }}>
                           <button
                             onClick={() => updateQuantity(index, -1)}
-                            className="w-5 h-5 flex items-center justify-center text-[#2e2520] font-bold text-base leading-none hover:text-amber-600 transition"
+                            className="w-5 h-5 flex items-center justify-center text-[#2e2520] font-bold text-base leading-none hover:opacity-70 transition"
                           >
                             −
                           </button>
@@ -188,7 +188,7 @@ export default function Checkout() {
                           </span>
                           <button
                             onClick={() => updateQuantity(index, 1)}
-                            className="w-5 h-5 flex items-center justify-center text-[#2e2520] font-bold text-base leading-none hover:text-amber-600 transition"
+                            className="w-5 h-5 flex items-center justify-center text-[#2e2520] font-bold text-base leading-none hover:opacity-70 transition"
                           >
                             +
                           </button>
@@ -219,7 +219,10 @@ export default function Checkout() {
                     placeholder="Masukkan nama kamu..."
                     value={customerName}
                     onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-4 py-3 pr-10 rounded-xl border border-gray-200 bg-[#fdfaf7] text-[14px] text-[#2e2520] placeholder-stone-300 outline-none focus:border-[#f59e0b] focus:ring-2 focus:ring-amber-100 transition"
+                    className="w-full px-4 py-3 pr-10 rounded-xl border border-gray-200 bg-white text-[14px] text-[#2e2520] placeholder-stone-300 outline-none transition"
+                    style={{ boxShadow: 'none' }}
+                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #B8A98C'}
+                    onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -237,13 +240,16 @@ export default function Checkout() {
                   value={additionalNotes}
                   onChange={(e) => setAdditionalNotes(e.target.value)}
                   rows={3}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-[#fdfaf7] text-[14px] text-[#2e2520] placeholder-stone-300 outline-none focus:border-[#f59e0b] focus:ring-2 focus:ring-amber-100 transition resize-none"
+                  className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-white text-[14px] text-[#2e2520] placeholder-stone-300 outline-none transition resize-none"
+                  style={{ boxShadow: 'none' }}
+                  onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #B8A98C'}
+                  onBlur={(e) => e.target.style.boxShadow = 'none'}
                 />
               </div>
             </div>
 
             {/* Ringkasan Pembayaran */}
-            <div className="bg-[#fdf4e9] rounded-2xl p-5">
+            <div className="rounded-2xl p-5" style={{ backgroundColor: '#F5F1EC' }}>
               <h2 className="text-[15px] font-bold text-[#2e2520] mb-4">Ringkasan Pembayaran</h2>
 
               <div className="space-y-3">
@@ -259,10 +265,10 @@ export default function Checkout() {
                     Rp {tax.toLocaleString('id-ID')}
                   </span>
                 </div>
-                <div className="border-t border-amber-200/70 pt-3">
+                <div className="border-t border-gray-200 pt-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[14px] font-bold text-[#2e2520]">Total Pembayaran</span>
-                    <span className="text-[18px] font-black text-amber-700">
+                    <span className="text-[18px] font-black" style={{ color: '#B8A98C' }}>
                       Rp {grandTotal.toLocaleString('id-ID')}
                     </span>
                   </div>
@@ -274,9 +280,10 @@ export default function Checkout() {
             <button
               onClick={handlePlaceOrder}
               disabled={loading}
-              className={`hidden md:flex w-full rounded-full bg-[#f59e0b] text-white font-bold py-4 shadow-lg shadow-amber-500/25 justify-center items-center gap-2 hover:bg-[#d97706] transition text-[15px] ${
+              className={`hidden md:flex w-full rounded-full text-white font-bold py-4 shadow-lg justify-center items-center gap-2 hover:opacity-90 transition text-[15px] ${
                 loading ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer'
               }`}
+              style={{ backgroundColor: '#B8A98C' }}
             >
               {loading ? (
                 <>
@@ -304,14 +311,15 @@ export default function Checkout() {
       <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-stone-100 px-4 py-3 shadow-lg">
         <div className="flex items-center justify-between mb-2">
           <span className="text-[12px] text-stone-400">Total Pembayaran</span>
-          <span className="text-[16px] font-black text-amber-700">Rp {grandTotal.toLocaleString('id-ID')}</span>
+          <span className="text-[16px] font-black" style={{ color: '#B8A98C' }}>Rp {grandTotal.toLocaleString('id-ID')}</span>
         </div>
         <button
           onClick={handlePlaceOrder}
           disabled={loading}
-          className={`w-full rounded-full bg-[#f59e0b] text-white font-bold py-3.5 flex justify-center items-center gap-2 hover:bg-[#d97706] transition text-[15px] ${
+          className={`w-full rounded-full text-white font-bold py-3.5 flex justify-center items-center gap-2 hover:opacity-90 transition text-[15px] ${
             loading ? 'opacity-70 cursor-not-allowed' : ''
           }`}
+          style={{ backgroundColor: '#B8A98C' }}
         >
           {loading ? 'Sedang Memproses...' : 'Place Order →'}
         </button>
