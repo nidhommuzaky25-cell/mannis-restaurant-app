@@ -48,18 +48,21 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddControllers();
 
-// Disable Swagger temporarily for .NET 10 compatibility
-// builder.Services.AddEndpointsApiExplorer();
-// builder.Services.AddSwaggerGen();
+// Enable Swagger for API documentation
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Disable Swagger temporarily
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
+// Enable Swagger in Development
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+    
+    // Redirect root URL to Swagger
+    app.MapGet("/", () => Results.Redirect("/swagger"));
+}
 
 app.UseHttpsRedirection();
 
