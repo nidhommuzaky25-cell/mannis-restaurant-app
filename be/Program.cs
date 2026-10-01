@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using be.Data;
+using be.Repositories;
+using be.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +9,18 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// 2. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API)
+// 2. DAFTARKAN REPOSITORIES (Data Access Layer)
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+// 3. DAFTARKAN SERVICES (Business Logic Layer)
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+
+// 4. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API)
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowReactApp",
@@ -23,7 +36,7 @@ builder.Services.AddCors(options =>
             });
     });
 
-// 3. Naikkan batas ukuran upload file (default 28MB, kita set 50MB)
+// 5. Naikkan batas ukuran upload file (default 28MB, kita set 50MB)
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 52_428_800; // 50 MB
@@ -50,10 +63,10 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 
-// 4. AKTIFKAN STATIC FILES (untuk serve foto dari wwwroot/uploads)
+// 6. AKTIFKAN STATIC FILES (untuk serve foto dari wwwroot/uploads)
 app.UseStaticFiles();
 
-// 5. AKTIFKAN MIDDLEWARE CORS (Harus dipasang SEBELUM app.MapControllers)
+// 7. AKTIFKAN MIDDLEWARE CORS (Harus dipasang SEBELUM app.MapControllers)
 app.UseCors("AllowReactApp");
 
 app.MapControllers();

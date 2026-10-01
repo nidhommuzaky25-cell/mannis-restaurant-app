@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using be.Data;
 using be.Models;
+using be.Services;
 
 namespace be.Controllers
 {
@@ -9,12 +8,12 @@ namespace be.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProductService _productService;
         private readonly IWebHostEnvironment _env;
 
-        public ProductsController(AppDbContext context, IWebHostEnvironment env)
+        public ProductsController(IProductService productService, IWebHostEnvironment env)
         {
-            _context = context;
+            _productService = productService;
             _env = env;
         }
 
@@ -24,15 +23,7 @@ namespace be.Controllers
         {
             try
             {
-                var query = _context.Products.AsQueryable();
-
-                if (!string.IsNullOrEmpty(search))
-                {
-                    query = query.Where(p => p.ProductName != null && p.ProductName.Contains(search));
-                }
-
-                var products = await query.ToListAsync();
-
+                var products = await _productService.GetAllProductsAsync(search);
                 return Ok(products);
             }
             catch (Exception ex)
@@ -47,7 +38,7 @@ namespace be.Controllers
         {
             try
             {
-                var product = await _context.Products.FindAsync(id);
+                var product = await _productService.GetProductByIdAsync(id);
 
                 if (product == null)
                 {
@@ -102,10 +93,8 @@ namespace be.Controllers
         {
             try
             {
-                product.ProductId = 0;
-                _context.Products.Add(product);
-                await _context.SaveChangesAsync();
-                return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+                var createdProduct = await _productService.CreateProductAsync(product);
+                return CreatedAtAction(nameof(GetProductById), new { id = createdProduct.ProductId }, createdProduct);
             }
             catch (Exception ex)
             {
@@ -122,8 +111,10 @@ namespace be.Controllers
 
             try
             {
-                _context.Entry(product).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
-                await _context.SaveChangesAsync();
+                var success = await _productService.UpdateProductAsync(id, product);
+                if (!success)
+                    return NotFound(new { message = "Produk tidak ditemukan." });
+                
                 return NoContent();
             }
             catch (Exception ex)
@@ -138,12 +129,10 @@ namespace be.Controllers
         {
             try
             {
-                var product = await _context.Products.FindAsync(id);
-                if (product == null)
+                var success = await _productService.DeleteProductAsync(id);
+                if (!success)
                     return NotFound(new { message = "Produk tidak ditemukan." });
 
-                _context.Products.Remove(product);
-                await _context.SaveChangesAsync();
                 return NoContent();
             }
             catch (Exception ex)

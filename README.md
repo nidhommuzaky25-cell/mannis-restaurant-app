@@ -32,25 +32,37 @@ Aplikasi pemesanan makanan digital untuk restoran dengan sistem barcode QR untuk
 - **Entity Framework Core** - ORM
 - **SQL Server** - Database
 - **RESTful API** - Arsitektur API
+- **Clean Architecture** - Repository Pattern & Service Layer
 
 ## 📁 Struktur Project
 
 ```
 mannis-restaurant-app/
 ├── be/                          # Backend (.NET Core)
-│   ├── Controllers/            # API Controllers
+│   ├── Controllers/            # API Controllers (HTTP Layer)
 │   │   ├── AuthController.cs
 │   │   ├── ProductsController.cs
 │   │   ├── OrdersController.cs
 │   │   └── DashboardController.cs
+│   ├── Services/               # Business Logic Layer
+│   │   ├── AuthService.cs
+│   │   ├── ProductService.cs
+│   │   ├── OrderService.cs
+│   │   └── DashboardService.cs
+│   ├── Repositories/           # Data Access Layer
+│   │   ├── AdminRepository.cs
+│   │   ├── ProductRepository.cs
+│   │   └── OrderRepository.cs
 │   ├── Models/                 # Data Models
 │   │   ├── Admin.cs
 │   │   ├── Product.cs
 │   │   ├── Order.cs
 │   │   └── OrderDetail.cs
+│   ├── DTOs/                   # Data Transfer Objects
 │   ├── Data/                   # Database Context
 │   │   └── AppDbContext.cs
-│   └── Program.cs              # Entry Point
+│   ├── ARCHITECTURE.md         # Dokumentasi Arsitektur
+│   └── Program.cs              # Entry Point & DI Configuration
 │
 └── fe/                          # Frontend (React + Vite)
     ├── src/
@@ -160,6 +172,33 @@ npm run dev
 ```
 
 Frontend akan berjalan di: **http://localhost:5173**
+
+## 🏗️ Backend Architecture
+
+Project ini menggunakan **Clean Architecture** dengan 3 layer utama:
+
+### 1. Controllers (Presentation Layer)
+- Handle HTTP requests/responses
+- Input validation
+- Delegate logic ke Services
+
+### 2. Services (Business Logic Layer)  
+- Business rules dan validasi kompleks
+- Koordinasi antar repositories
+- Transform data untuk kebutuhan bisnis
+
+### 3. Repositories (Data Access Layer)
+- Database operations (CRUD)
+- Query building
+- Data persistence
+
+**Keuntungan:**
+- ✅ Separation of Concerns
+- ✅ Easy to Test (mockable dependencies)
+- ✅ Maintainable & Scalable
+- ✅ Reusable components
+
+📖 **Lihat detail lengkap di [be/ARCHITECTURE.md](be/ARCHITECTURE.md)**
 
 ## 🎨 Design System
 

@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using be.Data;
 using be.DTOs;
+using be.Services;
 
 namespace be.Controllers
 {
@@ -9,38 +8,33 @@ namespace be.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IAuthService _authService;
 
-        public AuthController(AppDbContext context)
+        public AuthController(IAuthService authService)
         {
-            _context = context;
+            _authService = authService;
         }
 
         // POST /api/auth/login
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            if (string.IsNullOrEmpty(dto.Username) || string.IsNullOrEmpty(dto.Password))
+            var (isSuccess, username, errorMessage) = await _authService.LoginAsync(dto.Username, dto.Password);
+
+            if (!isSuccess)
             {
-                return BadRequest(new { message = "Username dan password wajib diisi." });
+                if (errorMessage == "Username dan password wajib diisi.")
+                {
+                    return BadRequest(new { message = errorMessage });
+                }
+                return Unauthorized(new { message = errorMessage });
             }
 
-            // Cari admin berdasarkan username di database
-            var admin = await _context.Admins
-                .FirstOrDefaultAsync(a => a.Username == dto.Username);
-
-            // Validasi (mencocokkan password biasa sesuai isi tabel)
-            if (admin == null || admin.PasswordHash != dto.Password)
-            {
-                return Unauthorized(new { message = "Username atau password salah!" });
-            }
-
-            // Jika sukses, kembalikan data status login ke frontend
             return Ok(new
             {
                 message = "Login berhasil!",
-                username = admin.Username,
-                token = "MOCK_TOKEN_ADMIN_SECRET" // Token tiruan untuk disimpan di frontend
+                username = username,
+                token = "MOCK_TOKEN_ADMIN_SECRET"
             });
         }
     }
