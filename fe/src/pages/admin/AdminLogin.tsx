@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login, saveAuthToken } from '../services/authService';
+import { login, saveAuthToken } from '../../services/authService';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
