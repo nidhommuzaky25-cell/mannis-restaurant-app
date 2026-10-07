@@ -30,7 +30,7 @@ Aplikasi pemesanan makanan digital untuk restoran dengan sistem barcode QR untuk
 ### Backend
 - **ASP.NET Core 10** (C#)
 - **Entity Framework Core** - ORM
-- **SQL Server** - Database
+- **PostgreSQL** - Database (Cloud-ready)
 - **RESTful API** - Arsitektur API
 - **Clean Architecture** - Repository Pattern & Service Layer
 
@@ -86,59 +86,29 @@ mannis-restaurant-app/
 ### Prerequisites
 - Node.js (v18 atau lebih tinggi)
 - .NET SDK 10.0
-- SQL Server (atau SQL Server Express)
+- PostgreSQL 14+ (atau gunakan cloud: Supabase, Neon, Railway)
 
 ### 1. Setup Database
 
-```sql
--- Buat database
-CREATE DATABASE BarcodeRestoDB;
+**Opsi A: PostgreSQL Lokal (Development)**
 
--- Gunakan database
-USE BarcodeRestoDB;
-
--- Buat tabel Admins
-CREATE TABLE Admins (
-    AdminId INT PRIMARY KEY IDENTITY(1,1),
-    Username NVARCHAR(50) NOT NULL UNIQUE,
-    Password NVARCHAR(255) NOT NULL
-);
-
--- Buat tabel Products
-CREATE TABLE Products (
-    ProductId INT PRIMARY KEY IDENTITY(1,1),
-    ProductName NVARCHAR(100) NOT NULL,
-    Category NVARCHAR(50) NOT NULL,
-    Price DECIMAL(18,2) NOT NULL,
-    Description NVARCHAR(500),
-    ImageUrl NVARCHAR(500),
-    IsAvailable BIT NOT NULL DEFAULT 1
-);
-
--- Buat tabel Orders
-CREATE TABLE Orders (
-    OrderId INT PRIMARY KEY IDENTITY(1,1),
-    TableNumber NVARCHAR(10) NOT NULL,
-    TotalAmount DECIMAL(18,2) NOT NULL,
-    PaymentStatus NVARCHAR(20) NOT NULL,
-    OrderDate DATETIME NOT NULL DEFAULT GETDATE()
-);
-
--- Buat tabel OrderDetails
-CREATE TABLE OrderDetails (
-    OrderDetailId INT PRIMARY KEY IDENTITY(1,1),
-    OrderId INT NOT NULL,
-    ProductId INT NOT NULL,
-    Quantity INT NOT NULL,
-    Price DECIMAL(18,2) NOT NULL,
-    FOREIGN KEY (OrderId) REFERENCES Orders(OrderId),
-    FOREIGN KEY (ProductId) REFERENCES Products(ProductId)
-);
-
--- Insert admin default (password: admin123)
-INSERT INTO Admins (Username, Password) 
-VALUES ('admin', 'admin123');
+Install PostgreSQL dari https://www.postgresql.org/download/ atau gunakan Docker:
+```bash
+docker run --name postgres-mannis -e POSTGRES_PASSWORD=postgres -p 5432:5432 -d postgres:16
 ```
+
+Jalankan setup script:
+```bash
+psql -U postgres -d BarcodeRestoDB -f database-setup-postgresql.sql
+```
+
+**Opsi B: Cloud PostgreSQL (Recommended untuk Production)**
+
+1. Buat database gratis di [Supabase](https://supabase.com) atau [Neon](https://neon.tech)
+2. Copy connection string
+3. Update `be/appsettings.json`
+
+Lihat panduan lengkap di: **[POSTGRESQL_MIGRATION.md](POSTGRESQL_MIGRATION.md)**
 
 ### 2. Setup Backend
 
@@ -147,16 +117,17 @@ VALUES ('admin', 'admin123');
 cd be
 
 # Update connection string di appsettings.json
-# Sesuaikan dengan SQL Server kamu
+# Format PostgreSQL:
+# "Host=localhost;Port=5432;Database=BarcodeRestoDB;Username=postgres;Password=your_password"
 
 # Restore dependencies
 dotnet restore
 
 # Jalankan aplikasi
-dotnet run --urls "http://0.0.0.0:5029"
+dotnet run
 ```
 
-Backend akan berjalan di: **http://localhost:5029**
+Backend akan berjalan di: **http://localhost:5029/swagger**
 
 ### 3. Setup Frontend
 

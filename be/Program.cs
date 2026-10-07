@@ -5,9 +5,9 @@ using be.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 1. DAFTARKAN KONEKSI DATABASE KE SQL SERVER
+// 1. DAFTARKAN KONEKSI DATABASE KE POSTGRESQL
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // 2. DAFTARKAN REPOSITORIES (Data Access Layer)
 builder.Services.AddScoped<IAdminRepository, AdminRepository>();
@@ -26,13 +26,29 @@ builder.Services.AddCors(options =>
         options.AddPolicy("AllowReactApp",
             policy =>
             {
-                policy.WithOrigins(
-                          "http://localhost:5173",           // Local development
-                          "http://192.168.5.103:5029",       // Backend IP (untuk CORS dari client lain)
-                          "https://3254jhsj-5029.asse.devtunnels.ms" // Dev Tunnels (backup)
-                      )
+                policy.SetIsOriginAllowed(origin =>
+                      {
+                          // Allow localhost dengan port berapa saja
+                          if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
+                              return true;
+                          
+                          // Allow 127.0.0.1 dengan port berapa saja
+                          if (origin.StartsWith("http://127.0.0.1:") || origin.StartsWith("https://127.0.0.1:"))
+                              return true;
+                          
+                          // Allow semua IP private network (192.168.x.x)
+                          if (origin.StartsWith("http://192.168.") || origin.StartsWith("https://192.168."))
+                              return true;
+                          
+                          // Allow dev tunnels
+                          if (origin.Contains("devtunnels.ms"))
+                              return true;
+                          
+                          return false;
+                      })
                       .AllowAnyHeader()
-                      .AllowAnyMethod();
+                      .AllowAnyMethod()
+                      .AllowCredentials(); // Penting untuk cookies/auth
             });
     });
 
