@@ -121,6 +121,9 @@ build/
 .env.test.local
 .env.production.local
 
+# Development settings with sensitive data
+appsettings.Development.json
+
 # Editor directories and files
 .idea/
 *.swp
