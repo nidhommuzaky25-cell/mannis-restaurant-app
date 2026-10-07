@@ -33,6 +33,7 @@ const CATEGORIES = ['Semua Menu', 'Makanan Berat', 'Makanan Ringan', 'Minuman'];
 
 export default function Menu() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // Store all products
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [cart, setCart] = useState<CartItem[]>(getCart());
@@ -52,14 +53,14 @@ export default function Menu() {
     setCart(getCart());
   };
 
-  const fetchProducts = async (keyword: string) => {
+  // Load all products once on mount
+  const fetchAllProducts = async () => {
     try {
       setLoading(true);
-      const url = keyword
-        ? getApiUrl(`/api/products?search=${keyword}`)
-        : getApiUrl('/api/products');
-      const res = await fetch(url);
-      setProducts(await res.json());
+      const res = await fetch(getApiUrl('/api/products'));
+      const data = await res.json();
+      setAllProducts(data);
+      setProducts(data);
     } catch (e) {
       console.error('Gagal mengambil data menu:', e);
     } finally {
@@ -67,10 +68,32 @@ export default function Menu() {
     }
   };
 
+  // Load products only once on mount
   useEffect(() => {
-    const t = setTimeout(() => fetchProducts(search), 500);
-    return () => clearTimeout(t);
-  }, [search]);
+    fetchAllProducts();
+  }, []);
+
+  // Client-side filtering for search (no API call)
+  useEffect(() => {
+    let filtered = allProducts;
+
+    // Filter by search keyword (client-side)
+    if (search.trim()) {
+      const keyword = search.toLowerCase();
+      filtered = filtered.filter(p => 
+        p.productName.toLowerCase().includes(keyword) ||
+        p.description.toLowerCase().includes(keyword) ||
+        p.category.toLowerCase().includes(keyword)
+      );
+    }
+
+    // Filter by category (if not "Semua Menu")
+    if (activeCategory !== 'Semua Menu') {
+      filtered = filtered.filter(p => p.category === activeCategory);
+    }
+
+    setProducts(filtered);
+  }, [search, activeCategory, allProducts]);
 
   const getItemQty = (id: number) =>
     cart.find((i) => i.productId === id)?.quantity ?? 0;

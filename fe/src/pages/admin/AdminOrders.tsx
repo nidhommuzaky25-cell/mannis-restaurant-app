@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getApiUrl } from '../config/api';
+import { getApiUrl } from '../../config/api';
 
 interface OrderItem {
   namaProduk: string;
@@ -106,21 +106,20 @@ const PAGE_SIZE = 5;
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<OrderData[]>([]);
+  const [allOrders, setAllOrders] = useState<OrderData[]>([]); // Store all orders
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchOrders = async (keyword: string) => {
+  // Load all orders once on mount
+  const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      const url = keyword
-        ? getApiUrl(`/api/orders?search=${keyword}`)
-        : getApiUrl('/api/orders');
-      const response = await fetch(url);
+      const response = await fetch(getApiUrl('/api/orders'));
       const data = await response.json();
+      setAllOrders(data);
       setOrders(data);
-      setCurrentPage(1);
     } catch (error) {
       console.error('Gagal mengambil data orderan:', error);
     } finally {
@@ -128,10 +127,27 @@ export default function AdminOrders() {
     }
   };
 
+  // Load orders only once on mount
   useEffect(() => {
-    const t = setTimeout(() => fetchOrders(search), 400);
-    return () => clearTimeout(t);
-  }, [search]);
+    fetchAllOrders();
+  }, []);
+
+  // Client-side filtering for search (no API call)
+  useEffect(() => {
+    if (search.trim()) {
+      const keyword = search.toLowerCase();
+      const filtered = allOrders.filter(order =>
+        order.orderId.toString().includes(keyword) ||
+        order.customerName.toLowerCase().includes(keyword) ||
+        order.tableNumber.toLowerCase().includes(keyword) ||
+        order.status.toLowerCase().includes(keyword)
+      );
+      setOrders(filtered);
+    } else {
+      setOrders(allOrders);
+    }
+    setCurrentPage(1);
+  }, [search, allOrders]);
 
   const handleMarkAsLunas = async (orderId: number) => {
     try {
@@ -139,7 +155,10 @@ export default function AdminOrders() {
         getApiUrl(`/api/orders/${orderId}/lunas`),
         { method: 'PUT' }
       );
-      if (response.ok) fetchOrders(search);
+      if (response.ok) {
+        // Refresh data after update
+        await fetchAllOrders();
+      }
     } catch (error) {
       console.error('Gagal mengubah status:', error);
     }

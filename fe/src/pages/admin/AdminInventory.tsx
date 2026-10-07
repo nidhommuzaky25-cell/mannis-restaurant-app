@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getApiUrl } from '../config/api';
+import { getApiUrl } from '../../config/api';
 
 interface Product {
   productId: number;
@@ -188,21 +188,21 @@ const PAGE_SIZE = 8;
 
 export default function AdminInventory() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [allProducts, setAllProducts] = useState<Product[]>([]); // Store all products
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const fetchInventory = async (keyword: string) => {
+  // Load all products once on mount
+  const fetchAllProducts = async () => {
     try {
       setLoading(true);
-      const url = keyword
-        ? getApiUrl(`/api/products?search=${keyword}`)
-        : getApiUrl('/api/products');
-      const response = await fetch(url);
-      setProducts(await response.json());
-      setCurrentPage(1);
+      const response = await fetch(getApiUrl('/api/products'));
+      const data = await response.json();
+      setAllProducts(data);
+      setProducts(data);
     } catch (error) {
       console.error('Gagal memuat inventori produk:', error);
     } finally {
@@ -210,10 +210,27 @@ export default function AdminInventory() {
     }
   };
 
+  // Load products only once on mount
   useEffect(() => {
-    const t = setTimeout(() => fetchInventory(search), 400);
-    return () => clearTimeout(t);
-  }, [search]);
+    fetchAllProducts();
+  }, []);
+
+  // Client-side filtering for search (no API call)
+  useEffect(() => {
+    if (search.trim()) {
+      const keyword = search.toLowerCase();
+      const filtered = allProducts.filter(product =>
+        product.productName.toLowerCase().includes(keyword) ||
+        product.category.toLowerCase().includes(keyword) ||
+        product.description.toLowerCase().includes(keyword) ||
+        `FB-${String(product.productId).padStart(3, '0')}`.toLowerCase().includes(keyword)
+      );
+      setProducts(filtered);
+    } else {
+      setProducts(allProducts);
+    }
+    setCurrentPage(1);
+  }, [search, allProducts]);
 
   const handleSaveProduct = async (payload: Omit<Product, 'productId'> & { productId: number }) => {
     const isEditing = payload.productId !== 0;
@@ -236,7 +253,7 @@ export default function AdminInventory() {
       if (response.ok) {
         setShowModal(false);
         setEditingProduct(null);
-        fetchInventory(search);
+        fetchAllProducts();
       } else {
         // Tampilkan pesan error dari backend
         let errMsg = `Gagal ${isEditing ? 'memperbarui' : 'menambahkan'} produk.`;
@@ -256,7 +273,7 @@ export default function AdminInventory() {
     if (!window.confirm('Yakin ingin menghapus produk ini?')) return;
     try {
       const response = await fetch(getApiUrl(`/api/products/${productId}`), { method: 'DELETE' });
-      if (response.ok) fetchInventory(search);
+      if (response.ok) fetchAllProducts();
     } catch (error) { console.error('Gagal menghapus produk:', error); }
   };
 
