@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getApiUrl } from '../config/api';
+import { login, saveAuthToken } from '../services/authService';
 
 export default function AdminLogin() {
   const [username, setUsername] = useState('');
@@ -14,24 +14,12 @@ export default function AdminLogin() {
     setLoading(true);
 
     try {
-      const response = await fetch(getApiUrl('/api/auth/login'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        localStorage.setItem('admin_token', data.token);
-        localStorage.setItem('admin_user', data.username);
-        navigate('/admin/dashboard');
-      } else {
-        alert(data.message || 'Login gagal, periksa kembali akunmu.');
-      }
+      const data = await login({ username, password });
+      saveAuthToken(data.token, data.username);
+      navigate('/admin/dashboard');
     } catch (error) {
-      console.error('Error login:', error);
-      alert('Terjadi kesalahan koneksi ke server backend.');
+      const errorMessage = error instanceof Error ? error.message : 'Terjadi kesalahan koneksi ke server backend.';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }
