@@ -55,7 +55,7 @@ namespace be.Services
                 TableNumber = dto.TableNumber,
                 TotalAmount = totalAmount,
                 PaymentStatus = "Belum Bayar",
-                OrderDate = DateTime.Now,
+                OrderDate = DateTime.UtcNow, // PostgreSQL requires UTC
                 OrderDetails = orderDetailsList
             };
 
