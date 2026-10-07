@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { getApiUrl } from '../config/api';
 
 interface Product {
   productId: number;
@@ -36,7 +37,7 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
     const fetchProductDetail = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5029/api/products/${id}`
+          getApiUrl(`/api/products/${id}`)
         );
         if (response.ok) {
           setProduct(await response.json());

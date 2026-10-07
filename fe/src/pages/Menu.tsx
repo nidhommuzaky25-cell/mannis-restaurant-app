@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MenuDetail from './MenuDetail';
+import { getApiUrl } from '../config/api';
 
 interface Product {
   productId: number;
@@ -55,8 +56,8 @@ export default function Menu() {
     try {
       setLoading(true);
       const url = keyword
-        ? `http://localhost:5029/api/products?search=${keyword}`
-        : `http://localhost:5029/api/products`;
+        ? getApiUrl(`/api/products?search=${keyword}`)
+        : getApiUrl('/api/products');
       const res = await fetch(url);
       setProducts(await res.json());
     } catch (e) {

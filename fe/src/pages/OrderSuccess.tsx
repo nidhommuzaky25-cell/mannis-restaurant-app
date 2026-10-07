@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../config/api';
 
 interface OrderDetailResponse {
   orderId: number;
@@ -25,7 +26,7 @@ export default function OrderSuccess() {
     const fetchOrderData = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5029/api/orders?search=${id}`
+          getApiUrl(`/api/orders?search=${id}`)
         );
         if (response.ok) {
           const data = await response.json();

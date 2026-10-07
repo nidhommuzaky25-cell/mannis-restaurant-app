@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { getApiUrl } from '../config/api';
 
 interface OrderItem {
   namaProduk: string;
@@ -114,8 +115,8 @@ export default function AdminOrders() {
     try {
       setLoading(true);
       const url = keyword
-        ? `http://localhost:5029/api/orders?search=${keyword}`
-        : `http://localhost:5029/api/orders`;
+        ? getApiUrl(`/api/orders?search=${keyword}`)
+        : getApiUrl('/api/orders');
       const response = await fetch(url);
       const data = await response.json();
       setOrders(data);
@@ -135,7 +136,7 @@ export default function AdminOrders() {
   const handleMarkAsLunas = async (orderId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:5029/api/orders/${orderId}/lunas`,
+        getApiUrl(`/api/orders/${orderId}/lunas`),
         { method: 'PUT' }
       );
       if (response.ok) fetchOrders(search);
@@ -147,7 +148,7 @@ export default function AdminOrders() {
   const handlePrintReceipt = async (orderId: number) => {
     try {
       const response = await fetch(
-        `http://localhost:5029/api/orders/${orderId}/struk`
+        getApiUrl(`/api/orders/${orderId}/struk`)
       );
       const data = await response.json();
       if (response.ok) setSelectedReceipt(data);

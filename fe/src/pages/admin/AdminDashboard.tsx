@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { API_BASE_URL } from '../config/api';
 
 interface RecentOrder {
   orderId: number;
@@ -83,7 +84,7 @@ export default function AdminDashboard() {
   const [dropdownLabel, setDropdownLabel] = useState('Last 7 Days');
   const navigate = useNavigate();
 
-  const BASE = 'http://localhost:5029';
+  const BASE = API_BASE_URL;
 
   useEffect(() => {
     const fetchStats = async () => {

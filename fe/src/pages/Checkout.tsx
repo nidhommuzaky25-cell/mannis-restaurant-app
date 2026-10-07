@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getApiUrl } from '../config/api';
 
 interface CartItem {
   productId: number;
@@ -53,7 +54,7 @@ export default function Checkout() {
 
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:5029/api/orders', {
+      const response = await fetch(getApiUrl('/api/orders'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(orderData),
