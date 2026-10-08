@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using be.Data;
 using be.Repositories;
 using be.Services;
@@ -20,7 +23,33 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 
-// 4. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API)
+// 4. DAFTARKAN JWT AUTHENTICATION
+var jwtKey = builder.Configuration["Jwt:Key"];
+var jwtIssuer = builder.Configuration["Jwt:Issuer"];
+var jwtAudience = builder.Configuration["Jwt:Audience"];
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtIssuer,
+        ValidAudience = jwtAudience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey!))
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// 5. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API)
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowReactApp",
@@ -52,7 +81,7 @@ builder.Services.AddCors(options =>
             });
     });
 
-// 5. Naikkan batas ukuran upload file (default 28MB, kita set 50MB)
+// 6. Naikkan batas ukuran upload file (default 28MB, kita set 50MB)
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>
 {
     options.MultipartBodyLengthLimit = 52_428_800; // 50 MB
@@ -85,7 +114,11 @@ app.UseHttpsRedirection();
 // 6. AKTIFKAN STATIC FILES (untuk serve foto dari wwwroot/uploads)
 app.UseStaticFiles();
 
-// 7. AKTIFKAN MIDDLEWARE CORS (Harus dipasang SEBELUM app.MapControllers)
+// 7. AKTIFKAN AUTHENTICATION & AUTHORIZATION (Harus sebelum MapControllers)
+app.UseAuthentication();
+app.UseAuthorization();
+
+// 8. AKTIFKAN MIDDLEWARE CORS (Harus dipasang SEBELUM app.MapControllers)
 app.UseCors("AllowReactApp");
 
 app.MapControllers();

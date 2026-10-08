@@ -1,4 +1,5 @@
 import { getApiUrl } from '../config/api';
+import { getAuthHeaders } from './authService';
 
 /**
  * Order Service
@@ -51,14 +52,19 @@ export interface OrderReceipt {
 }
 
 /**
- * Get all orders atau search by keyword
+ * Get all orders atau search by keyword (Admin only - requires JWT)
  */
 export const getAllOrders = async (search?: string): Promise<Order[]> => {
   const url = search
     ? getApiUrl(`/api/orders?search=${encodeURIComponent(search)}`)
     : getApiUrl('/api/orders');
   
-  const response = await fetch(url);
+  const token = localStorage.getItem('admin_token');
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
   
   if (!response.ok) {
     throw new Error(`Failed to fetch orders: ${response.statusText}`);
@@ -105,11 +111,15 @@ export const createOrder = async (orderData: OrderCreateDto): Promise<{ orderId:
 };
 
 /**
- * Mark order as "Lunas" (paid)
+ * Mark order as "Lunas" (paid) - Admin only - requires JWT
  */
 export const markOrderAsLunas = async (orderId: number): Promise<void> => {
+  const token = localStorage.getItem('admin_token');
   const response = await fetch(getApiUrl(`/api/orders/${orderId}/lunas`), {
     method: 'PUT',
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
   });
   
   if (!response.ok) {

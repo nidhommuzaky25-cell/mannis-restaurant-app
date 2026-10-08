@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using be.Models;
 using be.Services;
 
@@ -55,6 +56,7 @@ namespace be.Controllers
 
         // POST /api/products/upload-image
         [HttpPost("upload-image")]
+        [Authorize] // Only authenticated admin can upload
         public async Task<IActionResult> UploadImage(IFormFile file)
         {
             if (file == null || file.Length == 0)
@@ -89,6 +91,7 @@ namespace be.Controllers
 
         // POST /api/products
         [HttpPost]
+        [Authorize] // Only authenticated admin can create
         public async Task<ActionResult<Product>> CreateProduct([FromBody] Product product)
         {
             try
@@ -104,6 +107,7 @@ namespace be.Controllers
 
         // PUT /api/products/5
         [HttpPut("{id}")]
+        [Authorize] // Only authenticated admin can update
         public async Task<IActionResult> UpdateProduct(int id, [FromBody] Product product)
         {
             if (id != product.ProductId)
@@ -125,6 +129,7 @@ namespace be.Controllers
 
         // DELETE /api/products/5
         [HttpDelete("{id}")]
+        [Authorize] // Only authenticated admin can delete
         public async Task<IActionResult> DeleteProduct(int id)
         {
             try

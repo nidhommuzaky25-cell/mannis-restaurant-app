@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import Menu from './pages/Menu';
 import Checkout from './pages/Checkout';
 import OrderSuccess from './pages/OrderSuccess';
+import ProtectedRoute from './components/ProtectedRoute';
 
 // Import Halaman Admin
 import AdminLogin from './pages/admin/AdminLogin';
@@ -33,9 +34,21 @@ function MainLayout() {
 
         {/* Rute Sisi Admin */}
         <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-        <Route path="/admin/inventory" element={<AdminInventory />} />
+        <Route path="/admin/dashboard" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/orders" element={
+          <ProtectedRoute>
+            <AdminOrders />
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/inventory" element={
+          <ProtectedRoute>
+            <AdminInventory />
+          </ProtectedRoute>
+        } />
       </Routes>
     </div>
   );

@@ -69,3 +69,15 @@ export const clearAuthData = (): void => {
 export const isAuthenticated = (): boolean => {
   return !!getAuthToken();
 };
+
+/**
+ * Get authorization headers with JWT token
+ * Use this for all authenticated API requests
+ */
+export const getAuthHeaders = (): HeadersInit => {
+  const token = getAuthToken();
+  return {
+    'Content-Type': 'application/json',
+    ...(token && { 'Authorization': `Bearer ${token}` })
+  };
+};

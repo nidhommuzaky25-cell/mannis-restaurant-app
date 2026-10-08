@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using be.Models;
 using be.DTOs;
 using be.Services;
@@ -50,6 +51,7 @@ namespace be.Controllers
         // ADMIN & SUCCESS PAGE: LIHAT SEMUA ORDER DENGAN FITUR SEARCH NAMA / MEJA / ID
         // GET /api/orders?search=2
         [HttpGet]
+        [Authorize] // Only authenticated admin can view all orders
         public async Task<IActionResult> GetOrders([FromQuery] string? search)
         {
             try
@@ -83,6 +85,7 @@ namespace be.Controllers
         // ADMIN: MARK AS LUNAS (Ubah Status)
         // PUT /api/orders/5/lunas
         [HttpPut("{id}/lunas")]
+        [Authorize] // Only authenticated admin can mark as lunas
         public async Task<IActionResult> MarkAsLunas(int id)
         {
             var (isSuccess, errorMessage) = await _orderService.MarkAsLunasAsync(id);

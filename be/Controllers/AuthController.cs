@@ -19,7 +19,7 @@ namespace be.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginDto dto)
         {
-            var (isSuccess, username, errorMessage) = await _authService.LoginAsync(dto.Username, dto.Password);
+            var (isSuccess, token, username, errorMessage) = await _authService.LoginAsync(dto.Username, dto.Password);
 
             if (!isSuccess)
             {
@@ -33,8 +33,8 @@ namespace be.Controllers
             return Ok(new
             {
                 message = "Login berhasil!",
-                username = username,
-                token = "MOCK_TOKEN_ADMIN_SECRET"
+                token = token,
+                username = username
             });
         }
     }

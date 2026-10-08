@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config/api';
+import { getAuthHeaders } from './authService';
 
 /**
  * Dashboard Service  
@@ -39,10 +40,15 @@ export interface DashboardStats {
 }
 
 /**
- * Get dashboard statistics
+ * Get dashboard statistics (Admin only - requires JWT)
  */
 export const getDashboardStats = async (): Promise<DashboardStats> => {
-  const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`);
+  const token = localStorage.getItem('admin_token');
+  const response = await fetch(`${API_BASE_URL}/api/dashboard/stats`, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
   
   if (!response.ok) {
     throw new Error(`Failed to fetch dashboard stats: ${response.statusText}`);
@@ -52,10 +58,15 @@ export const getDashboardStats = async (): Promise<DashboardStats> => {
 };
 
 /**
- * Get available months for chart
+ * Get available months for chart (Admin only - requires JWT)
  */
 export const getAvailableMonths = async (): Promise<AvailableMonth[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/dashboard/available-months`);
+  const token = localStorage.getItem('admin_token');
+  const response = await fetch(`${API_BASE_URL}/api/dashboard/available-months`, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
   
   if (!response.ok) {
     throw new Error(`Failed to fetch available months: ${response.statusText}`);
@@ -65,7 +76,7 @@ export const getAvailableMonths = async (): Promise<AvailableMonth[]> => {
 };
 
 /**
- * Get chart data (monthly or weekly)
+ * Get chart data (monthly or weekly) - Admin only - requires JWT
  */
 export const getChartData = async (
   year: number,
@@ -76,7 +87,12 @@ export const getChartData = async (
     ? `${API_BASE_URL}/api/dashboard/chart?year=${year}&view=monthly`
     : `${API_BASE_URL}/api/dashboard/chart?year=${year}&month=${month}&view=weekly`;
   
-  const response = await fetch(url);
+  const token = localStorage.getItem('admin_token');
+  const response = await fetch(url, {
+    headers: {
+      'Authorization': token ? `Bearer ${token}` : ''
+    }
+  });
   
   if (!response.ok) {
     throw new Error(`Failed to fetch chart data: ${response.statusText}`);
