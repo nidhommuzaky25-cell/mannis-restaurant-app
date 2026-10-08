@@ -1,5 +1,4 @@
 import { getApiUrl } from '../config/api';
-import { getAuthHeaders } from './authService';
 
 /**
  * Order Service

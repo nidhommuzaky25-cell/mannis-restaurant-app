@@ -62,7 +62,6 @@ function ProductFormModal({ isEditing, initial, onSave, onCancel }: ProductFormP
   const [category, setCategory] = useState(initial.category ?? 'Main Course');
   const [price, setPrice] = useState(initial.price ?? 0);
   const [description, setDescription] = useState(initial.description ?? '');
-  const [imageUrl, setImageUrl] = useState(initial.imageUrl ?? '');
   const [imagePreview, setImagePreview] = useState(initial.imageUrl ?? '');
   const [isAvailable, setIsAvailable] = useState(initial.isAvailable ?? true);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -80,7 +79,7 @@ function ProductFormModal({ isEditing, initial, onSave, onCancel }: ProductFormP
     e.preventDefault();
     setUploading(true);
 
-    let finalImageUrl = imageUrl;
+    let finalImageUrl = initial.imageUrl ?? '';
 
     // Jika ada file baru dipilih, upload dulu ke backend
     if (selectedFile) {

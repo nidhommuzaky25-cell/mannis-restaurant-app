@@ -1,12 +1,24 @@
 /**
  * API Configuration
  * 
- * Menggunakan environment variable untuk API base URL
- * sehingga bisa di-customize untuk development atau production
+ * Menggunakan runtime config atau environment variable
+ * Priority: window.APP_CONFIG > VITE_API_BASE_URL > localhost
  */
 
-// Ambil base URL dari environment variable, atau fallback ke localhost
-export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5029';
+// Declare window type for TypeScript
+declare global {
+  interface Window {
+    APP_CONFIG?: {
+      API_BASE_URL: string;
+    };
+  }
+}
+
+// Get API base URL from runtime config or environment variable
+export const API_BASE_URL = 
+  window.APP_CONFIG?.API_BASE_URL || 
+  import.meta.env.VITE_API_BASE_URL || 
+  'http://localhost:5029';
 
 /**
  * Helper function untuk membuat full API URL
