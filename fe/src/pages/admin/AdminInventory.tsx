@@ -86,8 +86,12 @@ function ProductFormModal({ isEditing, initial, onSave, onCancel }: ProductFormP
       try {
         const formData = new FormData();
         formData.append('file', selectedFile);
+        const token = localStorage.getItem('admin_token');
         const res = await fetch(getApiUrl('/api/products/upload-image'), {
           method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          },
           body: formData,
         });
         if (!res.ok) {
@@ -198,7 +202,12 @@ export default function AdminInventory() {
   const fetchAllProducts = async () => {
     try {
       setLoading(true);
-      const response = await fetch(getApiUrl('/api/products'));
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(getApiUrl('/api/products'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       setAllProducts(data);
       setProducts(data);
@@ -243,9 +252,13 @@ export default function AdminInventory() {
       : { productName: payload.productName, category: payload.category, price: payload.price, description: payload.description, imageUrl: payload.imageUrl, isAvailable: payload.isAvailable };
 
     try {
+      const token = localStorage.getItem('admin_token');
       const response = await fetch(url, {
         method: isEditing ? 'PUT' : 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
         body: JSON.stringify(body),
       });
 
@@ -271,7 +284,13 @@ export default function AdminInventory() {
   const handleDeleteClick = async (productId: number) => {
     if (!window.confirm('Yakin ingin menghapus produk ini?')) return;
     try {
-      const response = await fetch(getApiUrl(`/api/products/${productId}`), { method: 'DELETE' });
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(getApiUrl(`/api/products/${productId}`), { 
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (response.ok) fetchAllProducts();
     } catch (error) { console.error('Gagal menghapus produk:', error); }
   };

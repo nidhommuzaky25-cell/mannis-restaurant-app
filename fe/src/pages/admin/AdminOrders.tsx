@@ -116,7 +116,12 @@ export default function AdminOrders() {
   const fetchAllOrders = async () => {
     try {
       setLoading(true);
-      const response = await fetch(getApiUrl('/api/orders'));
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(getApiUrl('/api/orders'), {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       const data = await response.json();
       setAllOrders(data);
       setOrders(data);
@@ -151,9 +156,15 @@ export default function AdminOrders() {
 
   const handleMarkAsLunas = async (orderId: number) => {
     try {
+      const token = localStorage.getItem('admin_token');
       const response = await fetch(
         getApiUrl(`/api/orders/${orderId}/lunas`),
-        { method: 'PUT' }
+        { 
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
       if (response.ok) {
         // Refresh data after update
@@ -166,8 +177,14 @@ export default function AdminOrders() {
 
   const handlePrintReceipt = async (orderId: number) => {
     try {
+      const token = localStorage.getItem('admin_token');
       const response = await fetch(
-        getApiUrl(`/api/orders/${orderId}/struk`)
+        getApiUrl(`/api/orders/${orderId}/struk`),
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
       );
       const data = await response.json();
       if (response.ok) setSelectedReceipt(data);

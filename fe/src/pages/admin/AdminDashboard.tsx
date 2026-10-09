@@ -89,7 +89,12 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const res = await fetch(`${BASE}/api/dashboard/stats`);
+        const token = localStorage.getItem('admin_token');
+        const res = await fetch(`${BASE}/api/dashboard/stats`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (res.ok) {
           const data = await res.json();
           setStats(data);
@@ -104,7 +109,12 @@ export default function AdminDashboard() {
     };
     const fetchMonths = async () => {
       try {
-        const res = await fetch(`${BASE}/api/dashboard/available-months`);
+        const token = localStorage.getItem('admin_token');
+        const res = await fetch(`${BASE}/api/dashboard/available-months`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
         if (res.ok) setAvailableMonths(await res.json());
       } catch { /* ignore */ }
     };
@@ -116,10 +126,15 @@ export default function AdminDashboard() {
     setChartLoading(true);
     setShowDropdown(false);
     try {
+      const token = localStorage.getItem('admin_token');
       const url = mode === 'monthly'
         ? `${BASE}/api/dashboard/chart?year=${year}&view=monthly`
         : `${BASE}/api/dashboard/chart?year=${year}&month=${month}&view=weekly`;
-      const res = await fetch(url);
+      const res = await fetch(url, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       if (res.ok) {
         setChartPoints(await res.json());
         setChartMode(mode);
