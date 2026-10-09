@@ -49,37 +49,21 @@ builder.Services.AddAuthentication(options =>
 
 builder.Services.AddAuthorization();
 
-// 5. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API)
+// 5. DAFTARKAN POLICY CORS (Izinkan Frontend Mengakses API dari appsettings.json)
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
+                     ?? new[] { "http://localhost:5173" }; // Fallback jika tidak ada di config
+
 builder.Services.AddCors(options =>
-    {
-        options.AddPolicy("AllowReactApp",
-            policy =>
-            {
-                policy.SetIsOriginAllowed(origin =>
-                      {
-                          // Allow localhost dengan port berapa saja
-                          if (origin.StartsWith("http://localhost:") || origin.StartsWith("https://localhost:"))
-                              return true;
-                          
-                          // Allow 127.0.0.1 dengan port berapa saja
-                          if (origin.StartsWith("http://127.0.0.1:") || origin.StartsWith("https://127.0.0.1:"))
-                              return true;
-                          
-                          // Allow semua IP private network (192.168.x.x)
-                          if (origin.StartsWith("http://192.168.") || origin.StartsWith("https://192.168."))
-                              return true;
-                          
-                          // Allow dev tunnels
-                          if (origin.Contains("devtunnels.ms"))
-                              return true;
-                          
-                          return false;
-                      })
-                      .AllowAnyHeader()
-                      .AllowAnyMethod()
-                      .AllowCredentials(); // Penting untuk cookies/auth
-            });
-    });
+{
+    options.AddPolicy("AllowReactApp",
+        policy =>
+        {
+            policy.WithOrigins(allowedOrigins)
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials(); // Penting untuk cookies/auth
+        });
+});
 
 // 6. Naikkan batas ukuran upload file (default 28MB, kita set 50MB)
 builder.Services.Configure<Microsoft.AspNetCore.Http.Features.FormOptions>(options =>

@@ -310,22 +310,35 @@ Button/dropdown filters tetap menggunakan server-side untuk data consistency.
 
 ### CORS Configuration
 
-Jangan lupa update `be/Program.cs` untuk allow frontend production URL:
+CORS sudah di-configure menggunakan `appsettings.json` untuk flexibility. Cukup update array `AllowedOrigins`:
 
-```csharp
-builder.Services.AddCors(options =>
+**Development (`appsettings.Development.json`):**
+```json
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.WithOrigins(
-            "http://localhost:5173",              // Development
-            "https://your-frontend.vercel.app"   // Production - GANTI INI!
-        )
-        .AllowAnyMethod()
-        .AllowAnyHeader();
-    });
-});
+  "Cors": {
+    "AllowedOrigins": [
+      "http://localhost:5173",
+      "http://localhost:3000"
+    ]
+  }
+}
 ```
+
+**Production (`appsettings.json`):**
+```json
+{
+  "Cors": {
+    "AllowedOrigins": [
+      "https://your-frontend.vercel.app",
+      "https://your-production-domain.com"
+    ]
+  }
+}
+```
+
+✅ **Tidak perlu rebuild aplikasi!** Tinggal restart service setelah ubah config.
+
+📖 **Detail lengkap lihat di [CORS_CONFIGURATION.md](CORS_CONFIGURATION.md)**
 
 ## 👨‍💻 Developer
 
