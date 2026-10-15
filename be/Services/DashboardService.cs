@@ -28,6 +28,7 @@ namespace be.Services
                 .Select(o => new
                 {
                     o.OrderId,
+                    o.CustomerName, // Real customer name from checkout
                     o.TableNumber,
                     o.TotalAmount,
                     Status = o.PaymentStatus,
@@ -35,10 +36,10 @@ namespace be.Services
                 })
                 .ToListAsync();
 
-            // Chart default: 7 hari terakhir
-            var sevenDaysAgo = DateTime.Today.AddDays(-6);
+            // Chart default: 7 hari terakhir (UTC aware)
+            var sevenDaysAgo = DateTime.UtcNow.Date.AddDays(-6);
             var chartQuery = await _context.Orders
-                .Where(o => o.PaymentStatus == "Lunas" && o.OrderDate.Date >= sevenDaysAgo)
+                .Where(o => o.PaymentStatus == "Lunas" && o.OrderDate >= sevenDaysAgo)
                 .ToListAsync();
 
             var revenueChart = chartQuery

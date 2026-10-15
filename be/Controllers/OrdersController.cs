@@ -48,6 +48,47 @@ namespace be.Controllers
             });
         }
 
+        // PUBLIC: GET ORDER BY ID (untuk halaman OrderSuccess customer)
+        // GET /api/orders/public/17
+        [HttpGet("public/{id}")]
+        [AllowAnonymous] // Public endpoint - no authentication required
+        public async Task<IActionResult> GetOrderById(int id)
+        {
+            try
+            {
+                var order = await _orderService.GetOrderByIdAsync(id);
+
+                if (order == null)
+                {
+                    return NotFound(new { message = "Order tidak ditemukan." });
+                }
+
+                // Return single order data (same format as search result)
+                var result = new
+                {
+                    orderId = order.OrderId,
+                    customerName = order.CustomerName, // Real customer name
+                    tableNumber = order.TableNumber,
+                    orderDate = order.OrderDate,
+                    totalAmount = order.TotalAmount,
+                    status = order.PaymentStatus,
+                    itemsBeli = order.OrderDetails.Select(od => new
+                    {
+                        namaProduk = od.Product != null ? od.Product.ProductName : "Produk Dihapus",
+                        quantity = od.Quantity,
+                        price = od.Price,
+                        notes = od.Notes // Include item notes
+                    })
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = $"Internal Server Error: {ex.Message}" });
+            }
+        }
+
         // ADMIN & SUCCESS PAGE: LIHAT SEMUA ORDER DENGAN FITUR SEARCH NAMA / MEJA / ID
         // GET /api/orders?search=2
         [HttpGet]
@@ -61,16 +102,19 @@ namespace be.Controllers
                 // Mapping data agar rapi dan cocok dengan penamaan TypeScript frontend
                 var result = orders.Select(o => new
                 {
-                    o.OrderId,
-                    o.TableNumber,
-                    o.OrderDate,
-                    o.TotalAmount,
-                    Status = o.PaymentStatus,
+                    orderId = o.OrderId,
+                    customerName = o.CustomerName, // Real customer name from checkout
+                    tableNumber = o.TableNumber,
+                    orderDate = o.OrderDate,
+                    totalAmount = o.TotalAmount,
+                    status = o.PaymentStatus,
+                    additionalNotes = o.AdditionalNotes, // Include additional notes
                     itemsBeli = o.OrderDetails.Select(od => new
                     {
-                        NamaProduk = od.Product != null ? od.Product.ProductName : "Produk Dihapus",
-                        od.Quantity,
-                        od.Price
+                        namaProduk = od.Product != null ? od.Product.ProductName : "Produk Dihapus",
+                        quantity = od.Quantity,
+                        price = od.Price,
+                        notes = od.Notes // Include item notes
                     })
                 });
 

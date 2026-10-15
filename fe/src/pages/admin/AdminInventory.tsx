@@ -320,7 +320,19 @@ export default function AdminInventory() {
                 <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" strokeLinecap="round" />
               </svg>
               <input type="text" placeholder="Search product name, SKU..." value={search} onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-2.5 rounded-xl border border-stone-200 bg-white text-[14px] text-stone-700 placeholder-stone-400 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition shadow-sm" />
+                className="w-full pl-11 pr-11 py-2.5 rounded-xl border border-stone-200 bg-white text-[14px] text-stone-700 placeholder-stone-400 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition shadow-sm" />
+              {/* Clear button (X) */}
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition"
+                  title="Clear search"
+                >
+                  <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
             <button onClick={openAdd} className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-[14px] px-5 py-2.5 rounded-xl transition shadow-sm whitespace-nowrap">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>

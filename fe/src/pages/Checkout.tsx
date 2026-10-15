@@ -16,6 +16,9 @@ export default function Checkout() {
   const [customerName, setCustomerName] = useState('');
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [loading, setLoading] = useState(false);
+  const [editingIndex, setEditingIndex] = useState<number | null>(null); // Track which item is being edited
+  const [editNotes, setEditNotes] = useState(''); // Temp notes for editing
+  const [nameError, setNameError] = useState(false); // Track validation error for customer name
   const navigate = useNavigate();
 
   const tableNumber = localStorage.getItem('table_number') || '01';
@@ -33,13 +36,44 @@ export default function Checkout() {
     localStorage.setItem('cart', JSON.stringify(updatedCart));
   };
 
+  // Function to start editing notes
+  const startEditNotes = (index: number) => {
+    setEditingIndex(index);
+    setEditNotes(cart[index].notes || '');
+  };
+
+  // Function to save edited notes
+  const saveEditNotes = (index: number) => {
+    const updatedCart = [...cart];
+    updatedCart[index].notes = editNotes;
+    setCart(updatedCart);
+    localStorage.setItem('cart', JSON.stringify(updatedCart));
+    setEditingIndex(null);
+    setEditNotes('');
+  };
+
+  // Function to cancel editing
+  const cancelEditNotes = () => {
+    setEditingIndex(null);
+    setEditNotes('');
+  };
+
   const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const tax = totalAmount * 0.1;
   const grandTotal = totalAmount + tax;
 
   const handlePlaceOrder = async () => {
-    if (!customerName.trim()) { alert('Mohon isi Nama kamu terlebih dahulu!'); return; }
-    if (cart.length === 0) { alert('Keranjang belanja kamu kosong.'); return; }
+    // Simple validation - just highlight field in red
+    if (!customerName.trim()) {
+      setNameError(true);
+      return;
+    }
+    if (cart.length === 0) {
+      return;
+    }
+
+    // Clear name error if validation passes
+    setNameError(false);
 
     const orderData = {
       tableNumber,
@@ -110,7 +144,7 @@ export default function Checkout() {
         <div className="max-w-screen-xl mx-auto">
           <div className="text-white px-4 py-3 rounded-xl flex items-start gap-2 text-xs font-medium" style={{ backgroundColor: '#B8A98C' }}>
             <span className="mt-0.5 shrink-0">⚠️</span>
-            <span>Pembayaran harus dilakukan di <strong>KASIR</strong> dengan menyebutkan nomor pesanan.</span>
+            <span>Pembayaran harus dilakukan di <strong>KASIR</strong> dengan menunjukkan <strong>QR Code</strong> nomor pesanan.</span>
           </div>
         </div>
       </div>
@@ -170,8 +204,59 @@ export default function Checkout() {
                         <p className="text-[11px] text-stone-400 mb-0.5">
                           @ Rp {item.price.toLocaleString('id-ID')} / item
                         </p>
-                        {item.notes && (
-                          <p className="text-[11px] text-stone-400 italic line-clamp-1">✍️ {item.notes}</p>
+                        
+                        {/* Notes section with edit functionality */}
+                        {editingIndex === index ? (
+                          // Edit mode
+                          <div className="mt-2 space-y-2">
+                            <textarea
+                              value={editNotes}
+                              onChange={(e) => setEditNotes(e.target.value)}
+                              placeholder="Tambah catatan..."
+                              className="w-full px-3 py-2 text-[11px] border border-amber-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-200 resize-none"
+                              rows={2}
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <button
+                                onClick={() => saveEditNotes(index)}
+                                className="px-3 py-1 text-[11px] font-semibold text-white rounded-lg hover:opacity-90 transition"
+                                style={{ backgroundColor: '#B8A98C' }}
+                              >
+                                Simpan
+                              </button>
+                              <button
+                                onClick={cancelEditNotes}
+                                className="px-3 py-1 text-[11px] font-semibold text-stone-600 bg-stone-100 rounded-lg hover:bg-stone-200 transition"
+                              >
+                                Batal
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          // View mode
+                          <div className="flex items-start gap-2 mt-1">
+                            {item.notes ? (
+                              <>
+                                <p className="text-[11px] text-stone-400 italic flex-1">✍️ {item.notes}</p>
+                                <button
+                                  onClick={() => startEditNotes(index)}
+                                  className="text-[11px] font-semibold hover:opacity-70 transition shrink-0"
+                                  style={{ color: '#B8A98C' }}
+                                >
+                                  Edit
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                onClick={() => startEditNotes(index)}
+                                className="text-[11px] font-semibold hover:opacity-70 transition"
+                                style={{ color: '#B8A98C' }}
+                              >
+                                + Tambah catatan
+                              </button>
+                            )}
+                          </div>
                         )}
                       </div>
 
@@ -219,10 +304,19 @@ export default function Checkout() {
                     type="text"
                     placeholder="Masukkan nama kamu..."
                     value={customerName}
-                    onChange={(e) => setCustomerName(e.target.value)}
-                    className="w-full px-4 py-3 pr-10 rounded-xl border border-gray-200 bg-white text-[14px] text-[#2e2520] placeholder-stone-300 outline-none transition"
+                    onChange={(e) => {
+                      setCustomerName(e.target.value);
+                      if (nameError) setNameError(false); // Clear error when user types
+                    }}
+                    className={`w-full px-4 py-3 pr-10 rounded-xl border ${
+                      nameError ? 'border-red-400' : 'border-gray-200'
+                    } bg-white text-[14px] text-[#2e2520] placeholder-stone-300 outline-none transition`}
                     style={{ boxShadow: 'none' }}
-                    onFocus={(e) => e.target.style.boxShadow = '0 0 0 2px #B8A98C'}
+                    onFocus={(e) => {
+                      if (!nameError) {
+                        e.target.style.boxShadow = '0 0 0 2px #B8A98C';
+                      }
+                    }}
                     onBlur={(e) => e.target.style.boxShadow = 'none'}
                   />
                   <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-300" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">

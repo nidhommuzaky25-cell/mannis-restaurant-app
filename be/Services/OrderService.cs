@@ -46,16 +46,19 @@ namespace be.Services
                 {
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    Price = itemPrice
+                    Price = itemPrice,
+                    Notes = item.Notes // NEW: Save item notes
                 });
             }
 
             var order = new Order
             {
+                CustomerName = dto.CustomerName, // NEW: Save customer name
                 TableNumber = dto.TableNumber,
                 TotalAmount = totalAmount,
                 PaymentStatus = "Belum Bayar",
                 OrderDate = DateTime.UtcNow, // PostgreSQL requires UTC
+                AdditionalNotes = dto.GeneralNotes, // NEW: Save additional notes from customer
                 OrderDetails = orderDetailsList
             };
 
@@ -66,6 +69,11 @@ namespace be.Services
         public async Task<IEnumerable<Order>> GetAllOrdersAsync(string? search = null)
         {
             return await _orderRepository.GetAllOrdersAsync(search);
+        }
+
+        public async Task<Order?> GetOrderByIdAsync(int id)
+        {
+            return await _orderRepository.GetOrderWithDetailsAsync(id);
         }
 
         public async Task<(bool IsSuccess, string? ErrorMessage)> MarkAsLunasAsync(int id)

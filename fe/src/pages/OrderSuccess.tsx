@@ -26,11 +26,11 @@ export default function OrderSuccess() {
     const fetchOrderData = async () => {
       try {
         const response = await fetch(
-          getApiUrl(`/api/orders?search=${id}`)
+          getApiUrl(`/api/orders/public/${id}`)
         );
         if (response.ok) {
           const data = await response.json();
-          if (data && data.length > 0) setOrder(data[0]);
+          setOrder(data);
         }
       } catch (error) {
         console.error('Gagal memuat status order:', error);

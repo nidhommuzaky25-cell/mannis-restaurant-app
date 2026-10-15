@@ -111,6 +111,8 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true);
   const [selectedReceipt, setSelectedReceipt] = useState<any | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showFilterPopup, setShowFilterPopup] = useState(false); // Filter popup state
+  const [statusFilter, setStatusFilter] = useState<string>('All'); // Filter: All, Belum Bayar, Lunas
 
   // Load all orders once on mount
   const fetchAllOrders = async () => {
@@ -137,22 +139,29 @@ export default function AdminOrders() {
     fetchAllOrders();
   }, []);
 
-  // Client-side filtering for search (no API call)
+  // Client-side filtering for search AND status (no API call)
   useEffect(() => {
+    let filtered = allOrders;
+
+    // Filter by status first
+    if (statusFilter !== 'All') {
+      filtered = filtered.filter(order => order.status === statusFilter);
+    }
+
+    // Then filter by search keyword
     if (search.trim()) {
       const keyword = search.toLowerCase();
-      const filtered = allOrders.filter(order =>
+      filtered = filtered.filter(order =>
         order.orderId.toString().includes(keyword) ||
         order.customerName.toLowerCase().includes(keyword) ||
         order.tableNumber.toLowerCase().includes(keyword) ||
         order.status.toLowerCase().includes(keyword)
       );
-      setOrders(filtered);
-    } else {
-      setOrders(allOrders);
     }
+
+    setOrders(filtered);
     setCurrentPage(1);
-  }, [search, allOrders]);
+  }, [search, statusFilter, allOrders]);
 
   const handleMarkAsLunas = async (orderId: number) => {
     try {
@@ -237,7 +246,7 @@ export default function AdminOrders() {
             </div>
           </div>
 
-          {/* ── Search bar ── */}
+          {/* ── Search bar with clear button ── */}
           <div className="relative">
             <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
               <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" strokeLinecap="round" />
@@ -247,8 +256,20 @@ export default function AdminOrders() {
               placeholder="Search orders, customers, or tables..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 rounded-xl border border-stone-200 bg-white text-[14px] text-stone-700 placeholder-stone-400 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition shadow-sm"
+              className="w-full pl-11 pr-11 py-3 rounded-xl border border-stone-200 bg-white text-[14px] text-stone-700 placeholder-stone-400 outline-none focus:border-amber-400 focus:ring-2 focus:ring-amber-100 transition shadow-sm"
             />
+            {/* Clear button (X) */}
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center rounded-full bg-stone-200 hover:bg-stone-300 text-stone-600 transition"
+                title="Clear search"
+              >
+                <svg className="w-3 h-3" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            )}
           </div>
 
           {/* ── Live Orders table ── */}
@@ -263,13 +284,114 @@ export default function AdminOrders() {
                   Live Syncing
                 </span>
               </div>
-              <button className="flex items-center gap-1.5 text-[12px] font-semibold text-stone-500 border border-stone-200 rounded-xl px-3 py-1.5 hover:bg-stone-50 transition">
+              <button 
+                onClick={() => setShowFilterPopup(!showFilterPopup)}
+                className="flex items-center gap-1.5 text-[12px] font-semibold text-stone-500 border border-stone-200 rounded-xl px-3 py-1.5 hover:bg-stone-50 transition relative"
+              >
                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 4.5h14.25M3 9h9.75M3 13.5h5.25m5.25-.75L17.25 9m0 0L21 12.75M17.25 9v12" />
                 </svg>
                 Filter
+                {statusFilter !== 'All' && (
+                  <span className="w-2 h-2 bg-amber-500 rounded-full" />
+                )}
               </button>
             </div>
+
+            {/* Filter Popup (Beautiful Dropdown) */}
+            {showFilterPopup && (
+              <div className="absolute top-14 right-6 z-20 bg-white rounded-2xl border border-stone-200 shadow-2xl p-4 w-72 animate-in fade-in slide-in-from-top-2 duration-200">
+                <div className="flex items-center justify-between mb-3">
+                  <h4 className="text-[14px] font-bold text-stone-800">Filter by Status</h4>
+                  <button 
+                    onClick={() => setShowFilterPopup(false)}
+                    className="w-6 h-6 flex items-center justify-center rounded-lg hover:bg-stone-100 text-stone-400 hover:text-stone-600 transition"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="space-y-2">
+                  {/* All Orders */}
+                  <button
+                    onClick={() => { setStatusFilter('All'); setShowFilterPopup(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition ${
+                      statusFilter === 'All' 
+                        ? 'bg-gradient-to-r from-amber-50 to-amber-100 border-2 border-amber-300 text-amber-700' 
+                        : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                      </svg>
+                      All Orders
+                    </span>
+                    {statusFilter === 'All' && (
+                      <svg className="w-5 h-5 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Belum Bayar */}
+                  <button
+                    onClick={() => { setStatusFilter('Belum Bayar'); setShowFilterPopup(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition ${
+                      statusFilter === 'Belum Bayar' 
+                        ? 'bg-gradient-to-r from-red-50 to-red-100 border-2 border-red-300 text-red-700' 
+                        : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                      </svg>
+                      Belum Bayar
+                    </span>
+                    {statusFilter === 'Belum Bayar' && (
+                      <svg className="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+
+                  {/* Lunas */}
+                  <button
+                    onClick={() => { setStatusFilter('Lunas'); setShowFilterPopup(false); }}
+                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-[13px] font-semibold transition ${
+                      statusFilter === 'Lunas' 
+                        ? 'bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 text-green-700' 
+                        : 'bg-stone-50 border border-stone-200 text-stone-600 hover:bg-stone-100'
+                    }`}
+                  >
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      Lunas
+                    </span>
+                    {statusFilter === 'Lunas' && (
+                      <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+
+                {/* Clear All Filters */}
+                {statusFilter !== 'All' && (
+                  <button
+                    onClick={() => { setStatusFilter('All'); setShowFilterPopup(false); }}
+                    className="w-full mt-3 px-4 py-2 rounded-xl text-[12px] font-semibold text-stone-500 hover:text-stone-700 border border-dashed border-stone-300 hover:border-stone-400 transition"
+                  >
+                    Clear Filters
+                  </button>
+                )}
+              </div>
+            )}
 
             {loading ? (
               <div className="p-8 space-y-3">
@@ -286,7 +408,7 @@ export default function AdminOrders() {
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-stone-50 border-b border-stone-100">
-                      {['Order ID', 'Table', 'Customer', 'Items', 'Total Price', 'Status', 'Actions'].map((h) => (
+                      {['Order ID', 'Table', 'Customer', 'Items', 'Notes', 'Total Price', 'Status', 'Actions'].map((h) => (
                         <th key={h} className="px-5 py-3 text-[11px] font-bold text-stone-400 uppercase tracking-wider whitespace-nowrap">
                           {h}
                         </th>
@@ -323,6 +445,17 @@ export default function AdminOrders() {
                               )}
                             </div>
                           ))}
+                        </td>
+
+                        {/* Additional Notes */}
+                        <td className="px-5 py-4 max-w-[180px]">
+                          {order.additionalNotes ? (
+                            <div className="text-[12px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 italic leading-relaxed">
+                              ✍️ {order.additionalNotes}
+                            </div>
+                          ) : (
+                            <span className="text-[11px] text-stone-300 italic">No notes</span>
+                          )}
                         </td>
 
                         {/* Total */}

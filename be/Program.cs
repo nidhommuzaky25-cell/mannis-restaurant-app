@@ -93,6 +93,9 @@ if (app.Environment.IsDevelopment())
     app.MapGet("/", () => Results.Redirect("/swagger"));
 }
 
+// IMPORTANT: CORS MUST BE BEFORE OTHER MIDDLEWARES
+app.UseCors("AllowReactApp");
+
 app.UseHttpsRedirection();
 
 // 6. AKTIFKAN STATIC FILES (untuk serve foto dari wwwroot/uploads)
@@ -101,9 +104,6 @@ app.UseStaticFiles();
 // 7. AKTIFKAN AUTHENTICATION & AUTHORIZATION (Harus sebelum MapControllers)
 app.UseAuthentication();
 app.UseAuthorization();
-
-// 8. AKTIFKAN MIDDLEWARE CORS (Harus dipasang SEBELUM app.MapControllers)
-app.UseCors("AllowReactApp");
 
 app.MapControllers();
 

@@ -29,8 +29,6 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setQuantity(1);
-    setNotes('');
     setProduct(null);
     setLoading(true);
 
@@ -40,7 +38,22 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
           getApiUrl(`/api/products/${id}`)
         );
         if (response.ok) {
-          setProduct(await response.json());
+          const productData = await response.json();
+          setProduct(productData);
+          
+          // Load existing quantity and notes from cart if item exists
+          const existingCart = JSON.parse(localStorage.getItem('cart') || '[]');
+          const existingItem = existingCart.find(
+            (item: { productId: number }) => item.productId === productData.productId
+          );
+          
+          if (existingItem) {
+            setQuantity(existingItem.quantity || 1);
+            setNotes(existingItem.notes || '');
+          } else {
+            setQuantity(1);
+            setNotes('');
+          }
         }
       } catch (error) {
         console.error('Gagal memuat detail produk:', error);
@@ -72,8 +85,13 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
         item.productId === product.productId && item.notes === notes
     );
 
-    if (itemIndex > -1) existingCart[itemIndex].quantity += quantity;
-    else existingCart.push(newItem);
+    // If item exists with same notes, replace the quantity instead of adding
+    if (itemIndex > -1) {
+      existingCart[itemIndex].quantity = quantity;
+      existingCart[itemIndex].notes = notes;
+    } else {
+      existingCart.push(newItem);
+    }
 
     localStorage.setItem('cart', JSON.stringify(existingCart));
     onClose();
@@ -208,7 +226,17 @@ export default function MenuDetail({ id, onClose }: MenuDetailProps) {
       {/* MOBILE — Bottom Sheet (< md) */}
       <div className="md:hidden w-full" onClick={(e) => e.stopPropagation()}>
         <div className="h-16 w-full" />
-        <div className="bg-white rounded-t-[32px] max-h-[92vh] overflow-y-auto shadow-2xl">
+        <div className="bg-white rounded-t-[32px] max-h-[92vh] overflow-y-auto shadow-2xl relative">
+          {/* Close button untuk mobile */}
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 z-20 w-8 h-8 flex items-center justify-center rounded-full bg-white/90 hover:bg-white shadow-md text-stone-600 hover:text-stone-800 transition"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
           <div className="flex justify-center pt-3 pb-1 sticky top-0 bg-white z-10">
             <div className="w-10 h-1 bg-stone-300 rounded-full" />
           </div>
