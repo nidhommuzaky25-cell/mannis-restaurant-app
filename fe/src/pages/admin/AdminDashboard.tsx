@@ -1,39 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../../config/api';
-
-interface RecentOrder {
-  orderId: number;
-  tableNumber: string;
-  customerName: string;
-  totalAmount: number;
-  status: string;
-  orderDate: string;
-}
-
-interface ChartData {
-  date: string;
-  revenue: number;
-}
-
-interface ChartPoint {
-  label: string;
-  revenue: number;
-}
-
-interface AvailableMonth {
-  year: number;
-  month: number;
-  label: string;
-}
-
-interface DashboardStats {
-  totalRevenue: number;
-  totalOrders: number;
-  productSold: number;
-  recentOrders: RecentOrder[];
-  revenueChart: ChartData[];
-}
+import { getDashboardStats, getAvailableMonths, getChartData } from '../../services/dashboardService';
+import type { DashboardStats, AvailableMonth, ChartData, ChartPoint } from '../../services/dashboardService';
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -84,40 +52,33 @@ export default function AdminDashboard() {
   const [dropdownLabel, setDropdownLabel] = useState('Last 7 Days');
   const navigate = useNavigate();
 
-  const BASE = API_BASE_URL;
-
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem('admin_token');
-        const res = await fetch(`${BASE}/api/dashboard/stats`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setStats(data);
-          if (data.revenueChart?.length) {
-            setChartPoints(data.revenueChart.map((d: ChartData) => ({
-              label: new Date(d.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }),
-              revenue: d.revenue,
-            })));
-          }
+        const data = await getDashboardStats();
+        setStats(data);
+        if (data.revenueChart?.length) {
+          setChartPoints(data.revenueChart.map((d: ChartData) => ({
+            label: new Date(d.date).toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric' }),
+            revenue: d.revenue,
+          })));
         }
-      } catch (e) { console.error(e); } finally { setLoading(false); }
+      } catch (e) { 
+        console.error('Gagal mengambil stats dashboard:', e); 
+      } finally { 
+        setLoading(false); 
+      }
     };
+    
     const fetchMonths = async () => {
       try {
-        const token = localStorage.getItem('admin_token');
-        const res = await fetch(`${BASE}/api/dashboard/available-months`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        if (res.ok) setAvailableMonths(await res.json());
-      } catch { /* ignore */ }
+        const months = await getAvailableMonths();
+        setAvailableMonths(months);
+      } catch (e) { 
+        console.error('Gagal mengambil available months:', e);
+      }
     };
+    
     fetchStats();
     fetchMonths();
   }, []);
@@ -126,21 +87,15 @@ export default function AdminDashboard() {
     setChartLoading(true);
     setShowDropdown(false);
     try {
-      const token = localStorage.getItem('admin_token');
-      const url = mode === 'monthly'
-        ? `${BASE}/api/dashboard/chart?year=${year}&view=monthly`
-        : `${BASE}/api/dashboard/chart?year=${year}&month=${month}&view=weekly`;
-      const res = await fetch(url, {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      if (res.ok) {
-        setChartPoints(await res.json());
-        setChartMode(mode);
-        setDropdownLabel(label ?? `Tahun ${year}`);
-      }
-    } catch { /* ignore */ } finally { setChartLoading(false); }
+      const data = await getChartData(year, mode, month);
+      setChartPoints(data);
+      setChartMode(mode);
+      setDropdownLabel(label ?? `Tahun ${year}`);
+    } catch (e) { 
+      console.error('Gagal mengambil chart data:', e);
+    } finally { 
+      setChartLoading(false); 
+    }
   };
 
   const handleSelectDefault = () => {
