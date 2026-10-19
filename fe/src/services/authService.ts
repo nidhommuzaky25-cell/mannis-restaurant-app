@@ -65,9 +65,29 @@ export const clearAuthData = (): void => {
 
 /**
  * Check if user is authenticated
+ * Returns true only if token exists and is not expired
  */
 export const isAuthenticated = (): boolean => {
-  return !!getAuthToken();
+  const token = getAuthToken();
+  if (!token) return false;
+  
+  try {
+    // Decode JWT token (tanpa verify signature karena di client side)
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    
+    // Check expiry (exp dalam seconds, Date.now() dalam milliseconds)
+    if (payload.exp && payload.exp * 1000 < Date.now()) {
+      // Token expired, clear auth data
+      clearAuthData();
+      return false;
+    }
+    
+    return true;
+  } catch {
+    // Token invalid format, clear auth data
+    clearAuthData();
+    return false;
+  }
 };
 
 /**
