@@ -21,7 +21,7 @@ Aplikasi pemesanan makanan digital untuk restoran dengan sistem barcode QR untuk
 ## 🛠️ Tech Stack
 
 ### Frontend
-- **React 18** + **TypeScript**
+- **React 18** + **TypeScript** c
 - **Vite** - Build tool yang super cepat
 - **React Router** - Routing dan navigasi
 - **Tailwind CSS** - Styling modern dan responsive
